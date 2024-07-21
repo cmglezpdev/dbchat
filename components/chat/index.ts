@@ -1,4 +1,4 @@
 export * from './ChatHistory'
-export * from './InputMessage'
+export * from './ChatInputMessage'
 export * from './ChatSettings'
 export * from './ChatHeader'
