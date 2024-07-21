@@ -1,57 +1,69 @@
 'use client'
-import React, { useState, useRef, useEffect } from 'react'
-import { InputMessage } from '@/components/chat'
-import { BotBubbleMessage, HummanBubbleMessage } from '@/components/chat-bubbles'
+import React, { useState } from 'react'
+import { ChatHistory, ChatInputMessage, ChatSettings } from '@/components/chat'
+import { ChatMessage } from '@/types'
 
-type Message = {
-  id: number;
-  text: string;
-  sender: 'user' | 'ai';
-};
-
-export function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [inputText, setInputText] = useState('')
-  const chatContainerRef = useRef<HTMLDivElement>(null)
-
-  const addMessage = (text: string, sender: 'user' | 'ai') => {
-    setMessages(prev => [...prev, { id: Date.now(), text, sender }])
+const chatMessage: ChatMessage[] = [
+  {
+    id: 1,
+    content: 'Hola, ¿cómo estás?',
+    role: 'user'
+  },
+  {
+    id: 2,
+    content: 'Hola! Estoy bien, gracias. ¿En qué puedo ayudarte hoy?',
+    role: 'system'
+  },
+  {
+    id: 3,
+    content: 'Quisiera saber más sobre la inteligencia artificial.',
+    role: 'user'
+  },
+  {
+    id: 4,
+    content: 'Claro, la inteligencia artificial es un campo de la informática que se centra en la creación de sistemas capaces de realizar tareas que normalmente requieren inteligencia humana. ¿Te gustaría saber algo específico?',
+    role: 'system'
+  },
+  {
+    id: 5,
+    content: 'Sí, ¿cómo funcionan los modelos de lenguaje como tú?',
+    role: 'user'
+  },
+  {
+    id: 6,
+    content: 'Los modelos de lenguaje como yo funcionan utilizando redes neuronales profundas, específicamente un tipo de arquitectura llamada Transformer. Estos modelos son entrenados con grandes cantidades de texto para aprender patrones en el lenguaje y generar respuestas coherentes. ¿Quieres más detalles sobre algún aspecto en particular?',
+    role: 'system'
   }
+]
 
-  const handleSendMessage = () => {
-    if (inputText.trim()) {
-      addMessage(inputText, 'user')
-      setInputText('')
-      // Aquí puedes agregar la lógica para enviar el mensaje al backend
-      // y luego agregar la respuesta del AI
-    }
+export function ChatScreen() {
+  const [history, setHistory] = useState<ChatMessage[]>(chatMessage)
+
+  const handleSendMessage = (message: string) => {
+    setHistory(h => [...h, {
+      id: 23,
+      role: 'user',
+      content: message
+    }])
   }
-
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
-    }
-  }, [messages])
 
   return (
-    <div className='flex flex-col justify-between h-screen max-h-screen'>
-      <div
-        ref={chatContainerRef}
-        className='flex-1 overflow-y-scroll max-h-[calc(100vh - 250px)] p-4 space-y-4'
-      >
-        {messages.map(message => (
-          message.sender === 'ai'
-            ? (<BotBubbleMessage key={message.id} text={message.text} />)
-            : (<HummanBubbleMessage key={message.id} text={message.text} />)
-        ))}
-      </div>
-      <div className='p-4 border-t'>
-        <InputMessage
-          text={inputText}
-          setText={setInputText}
+    <main className='grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-3 lg:grid-cols-4'>
+      {/* Chat Settings */}
+      <ChatSettings />
+
+      <div className='relative flex h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4 md:col-span-2 lg:col-span-3'>
+        {/* Chat History */}
+        <ChatHistory
+          chats={history}
+          isLoading={false}
+        />
+
+        {/* Box Input Messages */}
+        <ChatInputMessage
           onSend={handleSendMessage}
         />
       </div>
-    </div>
+    </main>
   )
 }
