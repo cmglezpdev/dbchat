@@ -1,14 +1,14 @@
-import { ChatMessage } from '@/types'
+import { useEffect, useRef } from 'react'
+import { Message } from 'ai'
 import { BotBubbleMessage, HummanBubbleMessage } from '../chat-bubbles'
 import { TypingLoader } from '../loaders'
-import { useEffect, useRef } from 'react'
 
 type Props = {
-  chats: ChatMessage[]
+  messages: Message[]
   isLoading?: boolean;
 }
 
-export function ChatHistory({ chats, isLoading }: Props) {
+export function ChatHistory({ messages, isLoading }: Props) {
   const chatHistoryRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -16,17 +16,17 @@ export function ChatHistory({ chats, isLoading }: Props) {
     if (divHistory) {
       divHistory.scrollTop = divHistory.scrollHeight
     }
-  }, [chats])
+  }, [messages])
 
   return (
     <div
       ref={chatHistoryRef}
       className='flex-1 max-h-[500px] overflow-y-scroll'
     >
-      {chats.map(message => (
-        message.role === 'system'
-          ? (<BotBubbleMessage key={message.id} text={message.content} />)
-          : (<HummanBubbleMessage key={message.id} text={message.content} />)
+      {messages.map(message => (
+        message.role === 'user'
+          ? (<HummanBubbleMessage key={message.id} text={message.content} />)
+          : (<BotBubbleMessage key={message.id} text={message.content} />)
       ))}
 
       {isLoading && (

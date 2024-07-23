@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, FormEvent } from 'react'
 import { Textarea } from '../ui/textarea'
 import { Button } from '../ui/button'
 import { CornerDownLeft, Mic, Paperclip } from 'lucide-react'
@@ -6,41 +6,25 @@ import { Tooltip, TooltipTrigger, TooltipContent } from '../ui/tooltip'
 import { Label } from '../ui/label'
 
 type Props = {
-  onSend: (message: string) => void;
+  input: string;
+  onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }
 
-export function ChatInputMessage({ onSend }: Props) {
-  const [message, setMessage] = useState<string>('')
-
-  const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value)
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      onSend(message)
-      setMessage('')
-    }
-  }
-
+export function ChatInputMessage({ input, onChange, onSubmit }: Props) {
   return (
     <form
       className='relative overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring'
-      onSubmit={(e) => {
-        e.preventDefault()
-        onSend(message)
-        setMessage('')
-      }}
+      onSubmit={onSubmit}
     >
       <Label htmlFor='message' className='sr-only'>
         Message
       </Label>
       <Textarea
         id='message'
-        value={message}
-        onChange={handleTextChange}
-        onKeyDown={handleKeyDown}
+        value={input}
+        onChange={onChange}
+        // onKeyDown={handleKeyDown}
         rows={1}
         autoFocus
         spellCheck
