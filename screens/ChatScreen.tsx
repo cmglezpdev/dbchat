@@ -8,13 +8,13 @@ export function ChatScreen() {
   })
 
   return (
-    <main className='grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-3 lg:grid-cols-4'>
+    <main className='grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2 lg:grid-cols-4'>
       {/* Chat Settings */}
       <div className='relative hidden flex-col items-start gap-8 md:flex'>
         <ChatSettings />
       </div>
 
-      <div className='relative flex h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4 md:col-span-2 lg:col-span-3'>
+      <div className='relative flex h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4 lg:col-span-3'>
         {/* Chat History */}
         <ChatHistory
           messages={messages}
