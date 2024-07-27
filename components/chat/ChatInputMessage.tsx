@@ -1,61 +1,72 @@
-import React, { ChangeEvent, FormEvent } from 'react'
+import React from 'react'
 import { Textarea } from '../ui/textarea'
 import { Button } from '../ui/button'
-import { CornerDownLeft, Mic, Paperclip } from 'lucide-react'
-import { Tooltip, TooltipTrigger, TooltipContent } from '../ui/tooltip'
+import { CornerDownLeft } from 'lucide-react'
 import { Label } from '../ui/label'
 
 type Props = {
-  input: string;
-  onChange: (event: ChangeEvent<HTMLTextAreaElement>) => void;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  text: string;
+  onChange: (text: string) => void;
+  onSubmit: () => void;
 }
 
-export function ChatInputMessage({ input, onChange, onSubmit }: Props) {
+export function ChatInputMessage({ text: input, onChange, onSubmit }: Props) {
+  const hiddenDivRef = React.useRef<HTMLDivElement>(null)
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null)
+
+  React.useEffect(() => {
+    const div = hiddenDivRef.current
+    const textArea = textareaRef.current
+
+    if (div && textArea) {
+      div.innerText = input
+      textareaRef.current.style.height = `${div.offsetHeight}px`
+    }
+  }, [input])
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.ctrlKey && event.key === 'Enter') {
+      onChange(input + '\n')
+    } else if (event.key === 'Tab') {
+      event.preventDefault()
+      onChange(input + '\t')
+    } else if (event.key === 'Enter' && input.trim().length > 0) {
+      event.preventDefault()
+      onSubmit()
+    }
+  }
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    onSubmit()
+  }
+
   return (
     <form
-      className='relative overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring'
-      onSubmit={onSubmit}
+      className='overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring flex items-end'
+      onSubmit={handleSubmit}
     >
+      <div ref={hiddenDivRef} className='hidden' />
       <Label htmlFor='message' className='sr-only'>
         Message
       </Label>
       <Textarea
         id='message'
+        ref={textareaRef}
         value={input}
-        onChange={onChange}
-        // onKeyDown={handleKeyDown}
+        onChange={event => onChange(event.target.value)}
+        onKeyDown={handleKeyDown}
         rows={1}
         autoFocus
         spellCheck
         autoComplete='on'
         placeholder='Type your message here...'
-        className='min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0'
+        className='resize-none border-0 p-3 shadow-none focus-visible:ring-0'
       />
-      <div className='flex items-center p-3 pt-0'>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant='ghost' size='icon'>
-              <Paperclip className='size-4' />
-              <span className='sr-only'>Attach file</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side='top'>Attach File</TooltipContent>
-        </Tooltip>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant='ghost' size='icon'>
-              <Mic className='size-4' />
-              <span className='sr-only'>Use Microphone</span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side='top'>Use Microphone</TooltipContent>
-        </Tooltip>
-        <Button type='submit' size='sm' className='ml-auto gap-1.5'>
-          Send Message
-          <CornerDownLeft className='size-3.5' />
-        </Button>
-      </div>
+      <Button type='submit' disabled={input.trim().length === 0} size='sm' className='ml-auto gap-1.5'>
+        Send
+        <CornerDownLeft className='size-3.5' />
+      </Button>
     </form>
   )
 }
