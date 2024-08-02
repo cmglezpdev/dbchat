@@ -13,6 +13,7 @@ export async function POST(req: Request) {
     prompt: `
       Dado el siguiente esquema que representa la modelación de una base de datos para una aplicación con unos requerimientos específicos. 
       Tu tarea es generar una descripción coherente de dicha modelación que explique en que consiste el modelo creado y como resulve los requerimientos del usuario.
+      Solo responde con la información necesaria. NO añadas text adicional para adornar la respuesta.
       
       REQUERIMIENTOS DE LA APLICACIÓN:
       ${requirements}

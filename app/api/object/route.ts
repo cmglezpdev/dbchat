@@ -23,7 +23,12 @@ export async function POST(req: Request) {
     dbDesignSchema
   )
 
-  return new Response(JSON.stringify(extendedDesign), {
+  const { design } = extendedDesign
+
+  return new Response(JSON.stringify({
+    requirements,
+    design
+  }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' }
   })

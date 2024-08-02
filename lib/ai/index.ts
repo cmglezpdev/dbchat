@@ -21,6 +21,9 @@ export function databaseDesignPrompt(requirements: string): string {
     - Para cada entidad menciona además que propiedades son primary key y cuales son foreign key.
     - Si la relacion es "many_to_many" entonces crea una nueva entidad que agrupe la relación entre las dos entidadades.
     - Si la relacion es otra entonces añade el id de una tabla como foreign key de la otra tabla.
+    - Los primery keys de las entidades deben ser llamados solo como id siempre que sea posible.
+    - Los nombres de las entidades deben ser en plurar
+    - Todos los nombres de las entidades, propiedades y demas deben estar en ingles
     
     -------------------------------------
     Ejemplos:
@@ -29,74 +32,75 @@ export function databaseDesignPrompt(requirements: string): string {
     {
       "design": [
         {
-          "nombre": "Usuario",
-          "atributos": [
+          "name": "User",
+          "attributes": [
             "id",
-            "nombre",
+            "name",
             "email",
             "password"
           ],
           "primary_keys": ["id"],
-          "foreign_keys": [],
+          "foreign_keys": []
         },
         {
-          "nombre": "Publicacion",
-          "atributos": [
+          "name": "Post",
+          "attributes": [
             "id",
-            "contenido",
-            "fecha_creacion",
-            "usuario_id"
+            "content",
+            "creation_date",
+            "user_id"
           ],
           "primary_keys": ["id"],
           "foreign_keys": [
             {
-              "id": "usuario_id",
-              "referencia": "Usuario(id)"    
-            }
-          ],
-        },
-        {
-          "nombre": "Comentario",
-          "atributos": [
-            "id",
-            "contenido",
-            "fecha_creacion",
-            "publicacion_id",
-            "usuario_id"
-          ],
-          "primary_keys": ["id"],
-          "foreign_keys": [
-            {
-              "id": "usuario_id",
-              "referencia": "Usuario(id)"    
-            },
-            {
-              "id": "publicacion_id",
-              "referencia": "Publicacion(id)"    
+              "id": "user_id",
+              "reference": "User(id)"
             }
           ]
         },
         {
-          "nombre": "Usuario_Likes",
-          "atributos": [
+          "name": "Comment",
+          "attributes": [
             "id",
-            "usuario_id",
-            "publicacion_id"
+            "content",
+            "creation_date",
+            "post_id",
+            "user_id"
           ],
           "primary_keys": ["id"],
           "foreign_keys": [
             {
-              "id": "usuario_id",
-              "referencia": "Usuario(id)"
+              "id": "user_id",
+              "reference": "User(id)"
             },
             {
-              "id": "publicacion_id",
-              "referencia": "Publicacion(id)"
+              "id": "post_id",
+              "reference": "Post(id)"
+            }
+          ]
+        },
+        {
+          "name": "User_Likes",
+          "attributes": [
+            "id",
+            "user_id",
+            "post_id"
+          ],
+          "primary_keys": ["id"],
+          "foreign_keys": [
+            {
+              "id": "user_id",
+              "reference": "User(id)"
+            },
+            {
+              "id": "post_id",
+              "reference": "Post(id)"
             }
           ]
         }
       ]
     }
+
     -------------------------------------
 
     REQUERIMIENTOS DEL USUARIO:
@@ -127,108 +131,110 @@ export function extendDatabaseDesignPrompt(requirements: string, databaseDesign:
     - Diseño de la base de datos: {
       "design": [
         {
-          "nombre": "Usuario",
-          "atributos": [
+          "name": "User",
+          "attributes": [
             "id",
-            "nombre",
+            "name",
             "email",
             "password"
           ],
-          "primary_keys": ["id"],
+          "primary_keys": ["id"]
         },
         {
-          "nombre": "Publicacion",
-          "atributos": [
+          "name": "Post",
+          "attributes": [
             "id",
-            "contenido",
-            "fecha_creacion",
-            "usuario_id"
+            "content",
+            "creation_date",
+            "user_id"
           ],
           "primary_keys": ["id"],
           "foreign_keys": [
             {
-              "id": "usuario_id",
-              "referencia": "Usuario(id)"    
-            }
-          ],
-        },
-        {
-          "nombre": "Comentario",
-          "atributos": [
-            "id",
-            "contenido",
-            "fecha_creacion",
-            "publicacion_id",
-            "usuario_id"
-          ],
-          "primary_keys": ["id"],
-          "foreign_keys": [
-            {
-              "id": "usuario_id",
-              "referencia": "Usuario(id)"    
-            },
-            {
-              "id": "publicacion_id",
-              "referencia": "Publicacion(id)"    
+              "id": "user_id",
+              "reference": "User(id)"
             }
           ]
         },
         {
-          "nombre": "Usuario_Likes",
-          "atributos": [
+          "name": "Comment",
+          "attributes": [
             "id",
-            "usuario_id",
-            "publicacion_id"
+            "content",
+            "creation_date",
+            "post_id",
+            "user_id"
           ],
           "primary_keys": ["id"],
           "foreign_keys": [
             {
-              "id": "usuario_id",
-              "referencia": "Usuario(id)"
+              "id": "user_id",
+              "reference": "User(id)"
             },
             {
-              "id": "publicacion_id",
-              "referencia": "Publicacion(id)"
+              "id": "post_id",
+              "reference": "Post(id)"
+            }
+          ]
+        },
+        {
+          "name": "User_Likes",
+          "attributes": [
+            "id",
+            "user_id",
+            "post_id"
+          ],
+          "primary_keys": ["id"],
+          "foreign_keys": [
+            {
+              "id": "user_id",
+              "reference": "User(id)"
+            },
+            {
+              "id": "post_id",
+              "reference": "Post(id)"
             }
           ]
         }
       ]
     }
 
+
     Tu respuesta deberia ser:
     {
       "design": [
         {
-          "nombre": "Usuario",
-          "atributos": [
+          "name": "User",
+          "attributes": [
             "id",
-            "nombre",
+            "name",
             "username",
             "email",
             "password"
           ],
-          "primary_keys": ["id"],
+          "primary_keys": ["id"]
         },
         {
-          "nombre": "Seguidores",
-          "atributos": [
-            "usuario_id",
-            "seguidor_id"
+          "name": "Followers",
+          "attributes": [
+            "user_id",
+            "follower_id"
           ],
-          "primary_keys": ["usuario_id", "seguidor_id"],
+          "primary_keys": ["user_id", "follower_id"],
           "foreign_keys": [
             {
-              "id": "usuario_id",
-              "referencia": "Usuario(id)"
+              "id": "user_id",
+              "reference": "User(id)"
             },
             {
-              "id": "seguidor_id",
-              "referencia": "Usuario(id)"
+              "id": "follower_id",
+              "reference": "User(id)"
             }
-          ],
+          ]
         }
       ]
     }
+
 
   -------------------------------------
 
