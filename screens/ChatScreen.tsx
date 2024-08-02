@@ -3,12 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useChat } from 'ai/react'
 import { ChatHistory, ChatInputMessage, ChatSettings } from '@/components/chat'
-import { DbDesign } from '@/lib/ai'
 
 export function ChatScreen() {
   const [isLoading, setLoading] = useState(false)
   const [dbDesign, setDbDesign] = useState<object | null>(null)
-  const { messages, isLoading: chatIsLoading, input, setInput, reload, setMessages } = useChat({
+  const { messages, isLoading: chatIsLoading, input, setInput, append, setMessages } = useChat({
     keepLastMessageOnError: true
   })
 
@@ -38,10 +37,18 @@ export function ChatScreen() {
       body: JSON.stringify({ input })
     })
 
-    // const dbDesignResponse: DbDesign = JSON.parse(await response.text())
-    const { design }: DbDesign = await response.json()
+    const { design, requirements } = await response.json()
     setDbDesign(design)
-    await reload()
+    setMessages([...messages])
+    await append({
+      id: crypto.randomUUID(), role: 'user', content: input
+    }, {
+      body: {
+        requirements,
+        design
+      }
+    })
+
     setLoading(false)
   }
 
@@ -71,3 +78,5 @@ export function ChatScreen() {
     </main>
   )
 }
+
+// Creame una forma de manejar el registro de usuarios en una paguina, que puedas controlar que el usuario se registra y los dispositivos (o sessiones) que tiene abiertas para poder restringir despues
