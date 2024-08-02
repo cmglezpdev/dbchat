@@ -1,3 +1,4 @@
+import { DbDesign } from '@/types'
 import * as z from 'zod'
 
 export function organizeRequirementsPrompt(requirements: string): string {
@@ -248,6 +249,47 @@ export function extendDatabaseDesignPrompt(requirements: string, databaseDesign:
   `
 }
 
+export function updateDatabasePrompt(dbDesign: DbDesign, changes: string) {
+  return `
+    Dado el siguiente esquema de una base de datos, actualiza el esquema según los siguientes cambios:
+    ${changes}
+    Devuelve solo el esquema actualizado en formato json respetando el mismo formato, propiedades, nombres, etc.
+
+    ESQUEMA DE BASE DE DATOS EN FORMATO JSON:
+    ${JSON.stringify(dbDesign)}
+
+    TU RESPUESTA:
+  `
+}
+
+export function generateSQLCommandsPrompt(dbDesign: DbDesign, database: string) {
+  return `
+    Dado el siguiente esquema de una base de datos ${database}, genera los commandos de sql necesarios para crear todas esas tablas, propiedades y relaciones.
+    Devuelve solo el código sql necesario. No añadas ninguna información extra.
+
+    ESQUEMA DE BASE DE DATOS EN FORMATO JSON:
+    ${JSON.stringify(dbDesign)}
+
+    TU RESPUESTA:
+  `
+}
+
+export function getDbDesignDescriptionPrompt(design: DbDesign, requirements: string) {
+  return `
+      Dado el siguiente esquema que representa la modelación de una base de datos para una aplicación con unos requerimientos específicos. 
+      Tu tarea es generar una descripción coherente de dicha modelación que explique en que consiste el modelo creado y como resulve los requerimientos del usuario.
+      Solo responde con la información necesaria. NO añadas text adicional para adornar la respuesta.
+      
+      REQUERIMIENTOS DE LA APLICACIÓN:
+      ${requirements}
+
+      DISEÑO DE LA BASE DE DATOS:
+      ${JSON.stringify(design)}
+
+      TU RESPUESTA:
+    `
+}
+
 export const dbDesignSchema = z.object({
   design: z.array(
     z.object({
@@ -263,8 +305,6 @@ export const dbDesignSchema = z.object({
     })
   )
 })
-
-export type DbDesign = z.infer<typeof dbDesignSchema>
 
 // Quiero crear una aplicación de chat en la que los usuarios puedan enviar mensajes entre ellos y que estén asociados a una sala de chat.
 // Los usuarios pueden tener conversaciones con otros usuarios sólo si son amigos.
