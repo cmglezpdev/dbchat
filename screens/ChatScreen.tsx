@@ -1,23 +1,24 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useChat } from 'ai/react'
+import { Message } from 'ai/react'
 import { ChatHistory, ChatInputMessage, ChatSettings } from '@/components/chat'
+import { DbDesign } from '@/types'
 
 export function ChatScreen() {
   const [isLoading, setLoading] = useState(false)
-  const [dbDesign, setDbDesign] = useState<object | null>(null)
-  const { messages, isLoading: chatIsLoading, input, setInput, append, setMessages } = useChat({
-    keepLastMessageOnError: true
-  })
+  const [design, setDesign] = useState<DbDesign | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState<string>('')
 
   useEffect(() => {
     if (messages.length === 0) {
-      setMessages([{
+      const firstMessage: Message = {
         id: crypto.randomUUID(),
         role: 'system',
         content: 'Hola, cuéntame cuales son los requerimientos de tu aplicación y te ayudaré a modelar una base de datos para tí.'
-      }])
+      }
+      setMessages([firstMessage])
     }
   }, [messages.length, setMessages])
 
@@ -26,30 +27,49 @@ export function ChatScreen() {
   }
 
   const handleSubmit = async () => {
+    console.debug('Send a new user question')
     setLoading(true)
     setInput('')
-    setMessages([...messages, { id: crypto.randomUUID(), role: 'user', content: input }])
-    const response = await fetch('/api/object', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ input })
-    })
+    const userMessage: Message = {
+      id: crypto.randomUUID(),
+      role: 'user',
+      content: input
+    }
 
-    const { design, requirements } = await response.json()
-    setDbDesign(design)
-    setMessages([...messages])
-    await append({
-      id: crypto.randomUUID(), role: 'user', content: input
-    }, {
-      body: {
-        requirements,
-        design
-      }
-    })
+    setMessages(ms => [...ms, userMessage])
 
-    setLoading(false)
+    console.debug('Calling api to generate response')
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: userMessage,
+          design
+        })
+      })
+
+      console.log(response)
+      const {
+        design: newDbDesign,
+        message: systemMessage,
+        response: resp
+      } = await response.json()
+      console.log(resp)
+
+      // update elements
+      setMessages(ms => [...ms, systemMessage])
+      setDesign(newDbDesign)
+    } catch (error) {
+      console.error('Error calling api', error)
+      setLoading(false)
+      return
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -57,7 +77,7 @@ export function ChatScreen() {
       {/* Chat Settings */}
       <div className='relative hidden flex-col items-start gap-8 md:flex'>
         <ChatSettings
-          dbDesign={dbDesign}
+          dbDesign={design}
         />
       </div>
 
@@ -65,7 +85,7 @@ export function ChatScreen() {
         {/* Chat History */}
         <ChatHistory
           messages={messages}
-          isLoading={isLoading || chatIsLoading}
+          isLoading={isLoading}
         />
 
         {/* Box Input Messages */}
@@ -79,4 +99,7 @@ export function ChatScreen() {
   )
 }
 
-// Creame una forma de manejar el registro de usuarios en una paguina, que puedas controlar que el usuario se registra y los dispositivos (o sessiones) que tiene abiertas para poder restringir despues
+// Creame una forma de manejar el registro de usuarios en una pagina, que puedas controlar que el usuario se registra y los dispositivos (o sessiones) que tiene abiertas para poder restringir despues
+
+// =========
+// Quiero crear un systema de pagos para usuarios que use las pasarelas de pago stripe y paypal
