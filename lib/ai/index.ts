@@ -262,6 +262,24 @@ export function updateDatabasePrompt(dbDesign: DbDesign, changes: string) {
   `
 }
 
+export function generateDescriptionAboutDbChanges(prevDbDesign: object, newDbDesign: object, changesRequired: string) {
+  return `
+    Dado los cambios requeridos por un usuario, la versión previa de la base de datos y la versión nueva con los cambios hechos, genérame una descripción detalla de los cambios que se hicieron al diseño de la base de datos.
+    El diseño de la base de datos está en formato JSON y los cambios requeridos es el input del usuario:
+    
+    CAMBIOS REQUERIDOS POR EL USUARIO
+    ${changesRequired}
+
+    VERSION PREVIA DEL MODELO DE LA BASE DE DATOS
+    ${JSON.stringify(prevDbDesign)}
+
+    VERSION NUEVA CON LOS CAMBIOS SOLICITADOS POR EL USUARIO DE LA BASE DE DATOS
+    ${JSON.stringify(newDbDesign)}
+
+    TU RESPUESTA:
+  `
+}
+
 export function generateSQLCommandsPrompt(dbDesign: DbDesign, database: string) {
   return `
     Dado el siguiente esquema de una base de datos ${database}, genera los commandos de sql necesarios para crear todas esas tablas, propiedades y relaciones.
@@ -293,13 +311,13 @@ export function getDbDesignDescriptionPrompt(design: DbDesign, requirements: str
 export const dbDesignSchema = z.object({
   design: z.array(
     z.object({
-      nombre: z.string(),
-      atributos: z.array(z.string()),
+      name: z.string(),
+      attributes: z.array(z.string()),
       primary_keys: z.array(z.string()),
       foreign_keys: z.array(
         z.object({
           id: z.string(),
-          referencia: z.string()
+          reference: z.string()
         })
       )
     })
