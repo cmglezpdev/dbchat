@@ -48,7 +48,7 @@ export function ChatHeader() {
                     <SelectValue placeholder='Select a model' />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='gpt4o-mini'>
+                    <SelectItem value='gpt-4o-mini'>
                       <div className='flex items-start gap-3 text-muted-foreground'>
                         <div className='flex items-center'>
                           <OpenAIIcon className='size-5' />
@@ -119,7 +119,7 @@ export function ChatHeader() {
                     <SelectValue placeholder='Select a model' />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='gpt4o-mini'>
+                    <SelectItem value='gpt-4o-mini'>
                       <div className='flex items-start gap-3 text-muted-foreground'>
                         <div className='flex items-center'>
                           <OpenAIIcon className='size-5' />

@@ -9,7 +9,7 @@ type Store = {
 }
 
 export const useConfigStore = create<Store>((set) => ({
-  model: 'gpt4o-mini',
+  model: 'gpt-4o-mini',
   apiKey: null,
 
   setModel: (model: string) => set((state) => ({ ...state, model })),
