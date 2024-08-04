@@ -13,10 +13,10 @@ export function organizeRequirementsPrompt(requirements: string): string {
   `
 }
 
-export function databaseDesignPrompt(requirements: string): string {
+export function databaseDesignPrompt(requirements: string, database: string = 'postgres'): string {
   return `
     Dado los requerimientos de una aplicación, los cuales mencionan el funcionamiento principal de la misma y un conjunto de características que describen a la aplicación,
-    tu tarea es extraer el cojunto de entidades, propiedades y relaciones que intervienen en un diseño de una base de datos relacional que modele la aplicación. 
+    tu tarea es extraer el conjunto de entidades, propiedades y relaciones que intervienen en un diseño de una base de datos ${database} que modele la aplicación. 
     Extrae detalladamente cada entidad, sus propiedades y relaciones entre ellos, mirando principalemente que resuelva todos los casos de uso de la aplicación.
     Devuelve el resultado en formato json y ten en cuenta lo siguente:
     - Para cada entidad menciona además que propiedades son primary key y cuales son foreign key.
@@ -280,13 +280,29 @@ export function generateDescriptionAboutDbChanges(prevDbDesign: object, newDbDes
   `
 }
 
-export function generateSQLCommandsPrompt(dbDesign: DbDesign, database: string) {
+export function generateSQLCommandsPrompt(jsonDbDesign: DbDesign, database: string = 'postgres') {
   return `
     Dado el siguiente esquema de una base de datos ${database}, genera los commandos de sql necesarios para crear todas esas tablas, propiedades y relaciones.
     Devuelve solo el código sql necesario. No añadas ninguna información extra.
 
     ESQUEMA DE BASE DE DATOS EN FORMATO JSON:
-    ${JSON.stringify(dbDesign)}
+    ${JSON.stringify(jsonDbDesign)}
+
+    TU RESPUESTA:
+  `
+}
+
+export function updateSQLDesignPrompt(jsonDbDesign: DbDesign, sqlDbDesign: string, changes: string, database: string = 'postgres') {
+  return `
+    Dado el siguiente esquema de una base de datos ${database}, actualiza el esquema según los siguientes cambios:
+    ${changes}
+    Devuelve solo el esquema actualizado en formato sql respetando el mismo formato, propiedades, nombres, etc.
+
+    ESQUEMA DE BASE DE DATOS EN FORMATO JSON:
+    ${JSON.stringify(jsonDbDesign)}
+
+    ESQUEMA DE BASE DE DATOS EN FORMATO SQL:
+    ${sqlDbDesign}
 
     TU RESPUESTA:
   `
