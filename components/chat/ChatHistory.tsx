@@ -21,13 +21,15 @@ export function ChatHistory({ messages, isLoading }: Props) {
   return (
     <div
       ref={chatHistoryRef}
-      className='flex-1 max-h-[500px] overflow-y-scroll'
+      className='flex-1 max-h-[500px] overflow-y-auto p-4 bg-muted/10'
     >
-      {messages.map(message => (
-        message.role === 'user'
-          ? (<HummanBubbleMessage key={message.id} text={message.content} />)
-          : (<BotBubbleMessage key={message.id} text={message.content} />)
-      ))}
+      <div className='grid gap-4'>
+        {messages.map(message => (
+          message.role === 'user'
+            ? (<HummanBubbleMessage key={message.id} text={message.content} />)
+            : (<BotBubbleMessage key={message.id} text={message.content} />)
+        ))}
+      </div>
 
       {isLoading && (
         <div className='col-start-1 col-end-12 fade-in'>
