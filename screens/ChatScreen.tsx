@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react'
 import { Message } from 'ai/react'
 import { ChatHistory, ChatInputMessage, ChatDbDesigns } from '@/components/chat'
 import { useConfigStore, useDesignStore } from '@/store'
+import { useToast } from '@/components/ui/use-toast'
 
 export function ChatScreen() {
   const { jsonDesign, setJsonDesign, setSqlDesign, sqlDesign } = useDesignStore()
   const config = useConfigStore((store) => ({ model: store.model, apiKey: store.apiKey }))
+  const { toast } = useToast()
   const [isLoading, setLoading] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState<string>('')
@@ -71,9 +73,12 @@ export function ChatScreen() {
       setJsonDesign(newJsonDesign)
       setSqlDesign(newSqlDesign)
     } catch (error: any) {
-      console.error('Error calling api', error)
-      alert(error.message)
-      console.log(error.message)
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive'
+      })
+      console.error(error)
       setLoading(false)
       return
     } finally {
