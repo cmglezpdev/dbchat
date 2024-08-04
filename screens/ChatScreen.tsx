@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Message } from 'ai/react'
-import { ChatHistory, ChatInputMessage, ChatSettings } from '@/components/chat'
+import { ChatHistory, ChatInputMessage, ChatDbDesigns } from '@/components/chat'
 import { DbDesign } from '@/types'
 
 export function ChatScreen() {
@@ -54,7 +54,6 @@ export function ChatScreen() {
         })
       })
 
-      console.log(response)
       const {
         jsonDesign: newJsonDesign,
         sqlDesign: newSqlDesign,
@@ -78,7 +77,7 @@ export function ChatScreen() {
     <main className='grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2'>
       {/* Chat Settings */}
       <div className='relative hidden flex-col items-start gap-8 md:flex'>
-        <ChatSettings
+        <ChatDbDesigns
           jsonDesign={jsonDesign}
           sqlDesign={sqlDesign}
         />

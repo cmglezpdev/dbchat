@@ -1,4 +1,4 @@
-import { Settings, Rabbit, Bird, Turtle, Share } from 'lucide-react'
+import { Settings, Rabbit, Bird, Turtle, Code } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '../ui/drawer'
 import { Input } from '../ui/input'
@@ -134,8 +134,8 @@ export function ChatHeader() {
         size='sm'
         className='ml-auto gap-1.5 text-sm'
       >
-        <Share className='size-3.5' />
-        Share
+        <Code className='size-3.5' />
+        Code
       </Button>
     </header>
   )
