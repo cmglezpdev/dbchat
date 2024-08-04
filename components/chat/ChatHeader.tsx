@@ -4,14 +4,15 @@ import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { OpenAIIcon } from '../icons'
 import { ChatDbDesigns } from './ChatDbDesigns'
-import { useDesignStore } from '@/store'
+import { useConfigStore, useDesignStore } from '@/store'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select'
-import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '../ui/drawer'
+import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerClose, DrawerFooter } from '../ui/drawer'
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet'
 
 export function ChatHeader() {
   const { jsonDesign, sqlDesign } = useDesignStore()
+  const { model, apiKey, setApiKey, setModel } = useConfigStore()
 
   return (
     <header className='sticky top-0 z-10 flex h-[57px] items-center gap-1 border-b bg-background px-4'>
@@ -39,7 +40,7 @@ export function ChatHeader() {
               </legend>
               <div className='grid gap-3'>
                 <Label htmlFor='model'>Model</Label>
-                <Select>
+                <Select onValueChange={(value) => setModel(value)} value={model}>
                   <SelectTrigger
                     id='model'
                     className='items-start [&_[data-description]]:hidden'
@@ -70,10 +71,21 @@ export function ChatHeader() {
               </div>
               <div className='grid gap-3'>
                 <Label htmlFor='api_key'>Api Key</Label>
-                <Input id='api_key' type='password' placeholder='sk-proj-tghRGo3dGkedvb63FG1dgl' />
+                <Input
+                  id='api_key'
+                  type='password'
+                  placeholder='sk-proj-tghRGo3dGkedvb63FG1dgl'
+                  onChange={(e) => setApiKey(e.target.value)}
+                  value={apiKey ?? ''}
+                />
               </div>
             </fieldset>
           </form>
+          <DrawerFooter className='flex items-end justify-end'>
+            <DrawerClose asChild className='max-w-min'>
+              <Button>Continue</Button>
+            </DrawerClose>
+          </DrawerFooter>
         </DrawerContent>
       </Drawer>
 
@@ -99,7 +111,7 @@ export function ChatHeader() {
               </legend>
               <div className='grid gap-3'>
                 <Label htmlFor='model'>Model</Label>
-                <Select>
+                <Select onValueChange={(value) => setModel(value)} value={model}>
                   <SelectTrigger
                     id='model'
                     className='items-start [&_[data-description]]:hidden'
@@ -130,7 +142,13 @@ export function ChatHeader() {
               </div>
               <div className='grid gap-3'>
                 <Label htmlFor='api_key'>Api Key</Label>
-                <Input id='api_key' type='password' placeholder='sk-proj-tghRGo3dGkedvb63FG1dgl' />
+                <Input
+                  id='api_key'
+                  type='password'
+                  placeholder='sk-proj-tghRGo3dGkedvb63FG1dgl'
+                  onChange={(e) => setApiKey(e.target.value)}
+                  value={apiKey ?? ''}
+                />
               </div>
             </fieldset>
           </form>
@@ -140,6 +158,7 @@ export function ChatHeader() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Database Design in mobile view */}
       <Sheet>
         <SheetTrigger asChild>
           <Button
