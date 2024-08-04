@@ -132,7 +132,7 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GenerateDbDesign(input: string, config: Config) {
+async function GenerateDbDesign(input: string, config: Config) {
   const requirements = await textLLMQuery(
     organizeRequirementsPrompt(input),
     config
@@ -162,7 +162,7 @@ export async function GenerateDbDesign(input: string, config: Config) {
   }
 }
 
-export async function UpdateDbDesign(input: string, jsonSchema: DbDesign, sqlSchema: string, config: Config) {
+async function UpdateDbDesign(input: string, jsonSchema: DbDesign, sqlSchema: string, config: Config) {
   console.log('Generation new json design')
   const newSchema = await objectLLMQuery(
     updateDatabasePrompt(jsonSchema, input),
