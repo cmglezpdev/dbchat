@@ -1,12 +1,16 @@
 type Props = {
-  dbDesign: object | null
+  jsonDesign: object | null;
+  sqlDesign: string | null;
 }
 
-export function ChatSettings({ dbDesign }: Props) {
+export function ChatSettings({ jsonDesign, sqlDesign }: Props) {
   return (
     <aside className='grid w-full items-start gap-6'>
       <pre>
-        {JSON.stringify(dbDesign, null, 3)}
+        {JSON.stringify(jsonDesign, null, 3)}
+      </pre>
+      <pre>
+        {sqlDesign}
       </pre>
     </aside>
   )

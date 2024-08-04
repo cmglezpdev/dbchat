@@ -1,16 +1,19 @@
 import { z, ZodSchema } from 'zod'
-import { generateObject, generateText, Message, tool } from 'ai'
+import { generateObject, generateText, Message } from 'ai'
 import { openai } from '@ai-sdk/openai'
-import { organizeRequirementsPrompt, databaseDesignPrompt, dbDesignSchema, extendDatabaseDesignPrompt, updateDatabasePrompt, generateDescriptionAboutDbChanges } from '@/lib/ai'
+import {
+  organizeRequirementsPrompt,
+  databaseDesignPrompt,
+  dbDesignSchema,
+  extendDatabaseDesignPrompt,
+  updateDatabasePrompt,
+  generateDescriptionAboutDbChanges,
+  generateSQLCommandsPrompt,
+  updateSQLDesignPrompt
+} from '@/lib/ai'
 import { DbDesign } from '@/types'
 
 export const maxDuration = 30
-
-export enum Tools {
-  updateDbJsonDesign = 'updateDbJsonDesign',
-  generateSqlCommandsFromJsonDesign = 'generateSqlCommandsFromJsonDesign',
-  generateDbJsonSchema = 'generateDbJsonSchema'
-}
 
 const PROMPTS_HISTORY: Message[] = []
 
@@ -20,17 +23,19 @@ const postSchema = z.object({
     role: z.string(),
     content: z.string()
   }),
-  design: dbDesignSchema.nullable().optional()
+  jsonDesign: dbDesignSchema.nullable().optional(),
+  sqlDesign: z.string().nullable().optional()
 })
 
 type BodyType = {
   message: Message,
-  design: DbDesign
+  jsonDesign: DbDesign
+  sqlDesign: string
 }
 
 export async function POST(req: Request) {
   const body: BodyType = await req.json()
-  const { message, design } = body
+  const { message, jsonDesign, sqlDesign } = body
 
   const isValid = postSchema.safeParse(body)
   if (!isValid.success) {
@@ -41,101 +46,66 @@ export async function POST(req: Request) {
   // saving missing messages history
   PROMPTS_HISTORY.push(message)
 
-  if (!design) {
+  if (!jsonDesign) {
     console.warn('Missing design. Checking that the user is asking for a db design')
     // TODO: check that the usee is asking for a db design
 
     console.log('Getting the first db model design')
-    const resp = await GetDbDesign(message.content)
+    const resp = await GenerateDbDesign(message.content)
 
     PROMPTS_HISTORY.push({
       id: crypto.randomUUID(),
       role: 'system',
-      content: `REQUIREMENTS:\n${resp.requirements}\nDB DESIGN:\n${JSON.stringify(resp.design)}`
+      content: `
+        REQUIREMENTS:
+        ${resp.message}
+        DB JSON DESIGN:
+        ${JSON.stringify(resp.jsonDesign)}
+        DB SQL DESIGN:
+        \n${resp.sqlDesign}`
     })
 
     return new Response(JSON.stringify({
       message: {
         id: crypto.randomUUID(),
         role: 'system',
-        content: resp.requirements
+        content: resp.message
       },
-      design: resp.design
+      jsonDesign: resp.jsonDesign,
+      sqlDesign: resp.sqlDesign
     }), { status: 200 })
   }
 
   // design provided. check type of question of the user
+  // TODO:
   console.log('Design provided. Checking type of question.')
 
-  const response = await generateText({
-    model: openai('gpt-4o-mini'),
-    system: 'Eres un asistente virtual especializado en diseño de software y base de datos.',
-    tools: {
-      [Tools.updateDbJsonDesign]: tool({
-        parameters: z.object({}),
-        description: 'The user want to update a un db json design. Update the db design based on the user input',
-        execute: async () => {
-          console.log(`${Tools.updateDbJsonDesign} called.`)
-          const newSchema = await objectLLMQuery(
-            updateDatabasePrompt(design, message.content),
-            dbDesignSchema
-          )
+  const resp = await UpdateDbDesign(message.content, jsonDesign, sqlDesign)
 
-          const changes = await textLLMQuery(
-            generateDescriptionAboutDbChanges(design, newSchema, message.content)
-          )
-
-          console.log({
-            newSchema,
-            changes
-          })
-
-          PROMPTS_HISTORY.push({
-            id: crypto.randomUUID(),
-            role: 'system',
-            content: `CHANGES\n${changes}\nNEW SCHEMA:\n${JSON.stringify(newSchema)}`
-          })
-
-          return {
-            design: newSchema,
-            message: { id: crypto.randomUUID(), role: 'system', content: changes }
-          }
-        }
-      }),
-      [Tools.generateSqlCommandsFromJsonDesign]: tool({
-        parameters: z.object({}),
-        description: 'The user want to generate sql commands. Get the sql commands to create database from a json design',
-        execute: async () => {
-          console.log('sqlCommands tool called')
-          return {
-            message: 'Sql Commands too called'
-          }
-        }
-      }),
-      [Tools.generateDbJsonSchema]: tool({
-        parameters: z.object({}),
-        description: 'Get the sql commands to create database from a design',
-        execute: async () => {
-          console.log('sqlCommands tool called')
-          return {
-            message: 'Sql Commands too called'
-          }
-        }
-      })
-    },
-    toolChoice: 'required',
-    prompt: message.content
+  PROMPTS_HISTORY.push({
+    id: crypto.randomUUID(),
+    role: 'system',
+    content: `
+      REQUIREMENTS:
+      ${resp.message}
+      DB JSON DESIGN:
+      ${JSON.stringify(resp.jsonDesign)}
+      DB SQL DESIGN:
+      \n${resp.sqlDesign}`
   })
 
-  const toolResult = response.toolResults[0].result
-
   return new Response(JSON.stringify({
-    ...toolResult,
-    response
+    message: {
+      id: crypto.randomUUID(),
+      role: 'system',
+      content: resp.message
+    },
+    jsonDesign: resp.jsonDesign,
+    sqlDesign: resp.sqlDesign
   }), { status: 200 })
 }
 
-export async function GetDbDesign(input: string) {
+export async function GenerateDbDesign(input: string) {
   const requirements = await textLLMQuery(
     organizeRequirementsPrompt(input)
   )
@@ -150,9 +120,38 @@ export async function GetDbDesign(input: string) {
     dbDesignSchema
   )
 
+  const sqlSchema = await textLLMQuery(
+    generateSQLCommandsPrompt(extendedDesign)
+  )
+
   return {
-    requirements,
-    design: extendedDesign
+    message: requirements,
+    jsonDesign: extendedDesign,
+    sqlDesign: sqlSchema
+  }
+}
+
+export async function UpdateDbDesign(input: string, jsonSchema: DbDesign, sqlSchema: string) {
+  console.log('Generation new json design')
+  const newSchema = await objectLLMQuery(
+    updateDatabasePrompt(jsonSchema, input),
+    dbDesignSchema
+  )
+
+  console.log('Generating changes description')
+  const changes = await textLLMQuery(
+    generateDescriptionAboutDbChanges(newSchema, newSchema, input)
+  )
+
+  console.log('Generating new sql design')
+  const newSqlSchema = await textLLMQuery(
+    updateSQLDesignPrompt(newSchema, sqlSchema, changes)
+  )
+
+  return {
+    message: changes,
+    jsonDesign: newSchema,
+    sqlDesign: newSqlSchema
   }
 }
 

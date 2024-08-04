@@ -7,7 +7,8 @@ import { DbDesign } from '@/types'
 
 export function ChatScreen() {
   const [isLoading, setLoading] = useState(false)
-  const [design, setDesign] = useState<DbDesign | null>(null)
+  const [jsonDesign, setJsonDesign] = useState<DbDesign | null>(null)
+  const [sqlDesign, setSqlDesign] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState<string>('')
 
@@ -48,21 +49,22 @@ export function ChatScreen() {
         },
         body: JSON.stringify({
           message: userMessage,
-          design
+          jsonDesign,
+          sqlDesign
         })
       })
 
       console.log(response)
       const {
-        design: newDbDesign,
-        message: systemMessage,
-        response: resp
+        jsonDesign: newJsonDesign,
+        sqlDesign: newSqlDesign,
+        message: systemMessage
       } = await response.json()
-      console.log(resp)
 
       // update elements
       setMessages(ms => [...ms, systemMessage])
-      setDesign(newDbDesign)
+      setJsonDesign(newJsonDesign)
+      setSqlDesign(newSqlDesign)
     } catch (error) {
       console.error('Error calling api', error)
       setLoading(false)
@@ -77,7 +79,8 @@ export function ChatScreen() {
       {/* Chat Settings */}
       <div className='relative hidden flex-col items-start gap-8 md:flex'>
         <ChatSettings
-          dbDesign={design}
+          jsonDesign={jsonDesign}
+          sqlDesign={sqlDesign}
         />
       </div>
 
