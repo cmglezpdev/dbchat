@@ -4,7 +4,7 @@ export type ChatMessage = {
   content: string
 }
 
-export type DbSchema = {
+export type Entity = {
   name: string;
   attributes: string[];
   primary_keys: string[];
@@ -15,5 +15,5 @@ export type DbSchema = {
 }
 
 export type DbDesign = {
-  design: DbSchema[];
+  design: Entity[];
 }
