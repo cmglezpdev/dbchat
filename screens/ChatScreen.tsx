@@ -3,10 +3,11 @@
 import { useEffect, useState } from 'react'
 import { Message } from 'ai/react'
 import { ChatHistory, ChatInputMessage, ChatDbDesigns } from '@/components/chat'
-import { useDesignStore } from '@/store'
+import { useConfigStore, useDesignStore } from '@/store'
 
 export function ChatScreen() {
   const { jsonDesign, setJsonDesign, setSqlDesign, sqlDesign } = useDesignStore()
+  const config = useConfigStore((store) => ({ model: store.model, apiKey: store.apiKey }))
   const [isLoading, setLoading] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState<string>('')
@@ -49,9 +50,15 @@ export function ChatScreen() {
         body: JSON.stringify({
           message: userMessage,
           jsonDesign,
-          sqlDesign
+          sqlDesign,
+          config
         })
       })
+
+      if (!response.ok) {
+        const { message } = await response.json()
+        throw new Error(message)
+      }
 
       const {
         jsonDesign: newJsonDesign,
@@ -63,8 +70,10 @@ export function ChatScreen() {
       setMessages(ms => [...ms, systemMessage])
       setJsonDesign(newJsonDesign)
       setSqlDesign(newSqlDesign)
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error calling api', error)
+      alert(error.message)
+      console.log(error.message)
       setLoading(false)
       return
     } finally {
@@ -94,6 +103,7 @@ export function ChatScreen() {
           text={input}
           onChange={handleInputChange}
           onSubmit={handleSubmit}
+          disabled={!config.apiKey || !config.model}
         />
       </div>
     </main>

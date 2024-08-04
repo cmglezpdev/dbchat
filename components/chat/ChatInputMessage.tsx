@@ -8,9 +8,10 @@ type Props = {
   text: string;
   onChange: (text: string) => void;
   onSubmit: () => void;
+  disabled?: boolean
 }
 
-export function ChatInputMessage({ text: input, onChange, onSubmit }: Props) {
+export function ChatInputMessage({ text: input, onChange, onSubmit, disabled }: Props) {
   const hiddenDivRef = React.useRef<HTMLDivElement>(null)
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
@@ -62,6 +63,7 @@ export function ChatInputMessage({ text: input, onChange, onSubmit }: Props) {
         autoComplete='on'
         placeholder='Type your message here...'
         className='resize-none border-0 p-3 shadow-none focus-visible:ring-0'
+        disabled={disabled}
       />
       <Button type='submit' disabled={input.trim().length === 0} size='sm' className='ml-auto gap-1.5'>
         Send
