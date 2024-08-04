@@ -3,11 +3,16 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { OpenAIIcon } from '../icons'
+import { ChatDbDesigns } from './ChatDbDesigns'
+import { useDesignStore } from '@/store'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select'
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '../ui/drawer'
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog'
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet'
 
 export function ChatHeader() {
+  const { jsonDesign, sqlDesign } = useDesignStore()
+
   return (
     <header className='sticky top-0 z-10 flex h-[57px] items-center gap-1 border-b bg-background px-4'>
       <h1 className='text-xl font-semibold'>Playground</h1>
@@ -135,14 +140,27 @@ export function ChatHeader() {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Button
-        variant='outline'
-        size='sm'
-        className='ml-auto gap-1.5 text-sm md:hidden'
-      >
-        <Code className='size-3.5' />
-        Code
-      </Button>
+      <Sheet>
+        <SheetTrigger asChild>
+          <Button
+            variant='outline'
+            size='sm'
+            className='ml-auto gap-1.5 text-sm md:hidden'
+          >
+            <Code className='size-3.5' />
+            Code
+          </Button>
+        </SheetTrigger>
+        <SheetContent side='bottom' className='w-screen h-[90vh]'>
+          <SheetHeader>
+            <SheetTitle>Database Design</SheetTitle>
+          </SheetHeader>
+          <ChatDbDesigns
+            jsonDesign={jsonDesign}
+            sqlDesign={sqlDesign}
+          />
+        </SheetContent>
+      </Sheet>
     </header>
   )
 }

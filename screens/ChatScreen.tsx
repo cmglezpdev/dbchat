@@ -3,12 +3,11 @@
 import { useEffect, useState } from 'react'
 import { Message } from 'ai/react'
 import { ChatHistory, ChatInputMessage, ChatDbDesigns } from '@/components/chat'
-import { DbDesign } from '@/types'
+import { useDesignStore } from '@/store'
 
 export function ChatScreen() {
+  const { jsonDesign, setJsonDesign, setSqlDesign, sqlDesign } = useDesignStore()
   const [isLoading, setLoading] = useState(false)
-  const [jsonDesign, setJsonDesign] = useState<DbDesign | null>(null)
-  const [sqlDesign, setSqlDesign] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState<string>('')
 

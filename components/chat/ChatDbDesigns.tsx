@@ -10,7 +10,7 @@ type Props = {
 
 export function ChatDbDesigns({ jsonDesign, sqlDesign }: Props) {
   return (
-    <aside className='w-full'>
+    <aside className='w-full max-h-[90vh] overflow-auto pb-20 md:mb-auto'>
       <Tabs defaultValue='design' className='w-full'>
         <div className='w-full flex justify-center'>
           <TabsList className=''>
@@ -28,8 +28,8 @@ export function ChatDbDesigns({ jsonDesign, sqlDesign }: Props) {
             ))
           )}
         </TabsContent>
-        <TabsContent value='code' className='w-full flex justify-center'>
-          <Markdown>
+        <TabsContent value='code' className='flex w-full'>
+          <Markdown className=''>
             {sqlDesign}
           </Markdown>
         </TabsContent>
