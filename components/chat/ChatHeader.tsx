@@ -1,15 +1,18 @@
-import { Settings, Rabbit, Bird, Turtle, Code } from 'lucide-react'
+import { Settings, Code } from 'lucide-react'
 import { Button } from '../ui/button'
-import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '../ui/drawer'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
+import { OpenAIIcon } from '../icons'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select'
-import { Textarea } from '../ui/textarea'
+import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '../ui/drawer'
+import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog'
 
 export function ChatHeader() {
   return (
     <header className='sticky top-0 z-10 flex h-[57px] items-center gap-1 border-b bg-background px-4'>
       <h1 className='text-xl font-semibold'>Playground</h1>
+
+      {/* Menu in mobile view */}
       <Drawer>
         <DrawerTrigger asChild>
           <Button variant='ghost' size='icon' className='md:hidden'>
@@ -39,51 +42,20 @@ export function ChatHeader() {
                     <SelectValue placeholder='Select a model' />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value='genesis'>
+                    <SelectItem value='gpt4o-mini'>
                       <div className='flex items-start gap-3 text-muted-foreground'>
-                        <Rabbit className='size-5' />
-                        <div className='grid gap-0.5'>
-                          <p>
-                            Neural{' '}
-                            <span className='font-medium text-foreground'>
-                              Genesis
-                            </span>
-                          </p>
-                          <p className='text-xs' data-description>
-                            Our fastest model for general use cases.
-                          </p>
+                        <div className='flex items-center'>
+                          <OpenAIIcon className='size-5' />
                         </div>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value='explorer'>
-                      <div className='flex items-start gap-3 text-muted-foreground'>
-                        <Bird className='size-5' />
                         <div className='grid gap-0.5'>
                           <p>
-                            Neural{' '}
+                            OpenAI{' '}
                             <span className='font-medium text-foreground'>
-                              Explorer
+                              GPT-4o mini
                             </span>
                           </p>
                           <p className='text-xs' data-description>
-                            Performance and speed for efficiency.
-                          </p>
-                        </div>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value='quantum'>
-                      <div className='flex items-start gap-3 text-muted-foreground'>
-                        <Turtle className='size-5' />
-                        <div className='grid gap-0.5'>
-                          <p>
-                            Neural{' '}
-                            <span className='font-medium text-foreground'>
-                              Quantum
-                            </span>
-                          </p>
-                          <p className='text-xs' data-description>
-                            The most powerful model for complex
-                            computations.
+                            Our most cost-efficient small model
                           </p>
                         </div>
                       </div>
@@ -92,47 +64,81 @@ export function ChatHeader() {
                 </Select>
               </div>
               <div className='grid gap-3'>
-                <Label htmlFor='temperature'>Temperature</Label>
-                <Input id='temperature' type='number' placeholder='0.4' />
-              </div>
-              <div className='grid gap-3'>
-                <Label htmlFor='top-p'>Top P</Label>
-                <Input id='top-p' type='number' placeholder='0.7' />
-              </div>
-              <div className='grid gap-3'>
-                <Label htmlFor='top-k'>Top K</Label>
-                <Input id='top-k' type='number' placeholder='0.0' />
-              </div>
-            </fieldset>
-            <fieldset className='grid gap-6 rounded-lg border p-4'>
-              <legend className='-ml-1 px-1 text-sm font-medium'>
-                Messages
-              </legend>
-              <div className='grid gap-3'>
-                <Label htmlFor='role'>Role</Label>
-                <Select defaultValue='system'>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Select a role' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='system'>System</SelectItem>
-                    <SelectItem value='user'>User</SelectItem>
-                    <SelectItem value='assistant'>Assistant</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className='grid gap-3'>
-                <Label htmlFor='content'>Content</Label>
-                <Textarea id='content' placeholder='You are a...' />
+                <Label htmlFor='api_key'>Api Key</Label>
+                <Input id='api_key' type='password' placeholder='sk-proj-tghRGo3dGkedvb63FG1dgl' />
               </div>
             </fieldset>
           </form>
         </DrawerContent>
       </Drawer>
+
+      {/* Menu in desktop view */}
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button variant='ghost' size='icon' className='hidden md:flex'>
+            <Settings className='size-4' />
+            <span className='sr-only'>Settings</span>
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent className='max-h-[80vh]'>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Configuration</AlertDialogTitle>
+            <AlertDialogDescription>
+              Configure the settings for the model and messages.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <form className='grid w-full items-start gap-6 overflow-auto p-4 pt-0'>
+            <fieldset className='grid gap-6 rounded-lg border p-4'>
+              <legend className='-ml-1 px-1 text-sm font-medium'>
+                Settings
+              </legend>
+              <div className='grid gap-3'>
+                <Label htmlFor='model'>Model</Label>
+                <Select>
+                  <SelectTrigger
+                    id='model'
+                    className='items-start [&_[data-description]]:hidden'
+                  >
+                    <SelectValue placeholder='Select a model' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value='gpt4o-mini'>
+                      <div className='flex items-start gap-3 text-muted-foreground'>
+                        <div className='flex items-center'>
+                          <OpenAIIcon className='size-5' />
+                        </div>
+                        <div className='grid gap-0.5'>
+                          <p>
+                            OpenAI{' '}
+                            <span className='font-medium text-foreground'>
+                              GPT-4o mini
+                            </span>
+                          </p>
+                          <p className='text-xs' data-description>
+                            Our most cost-efficient small model
+                          </p>
+                        </div>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className='grid gap-3'>
+                <Label htmlFor='api_key'>Api Key</Label>
+                <Input id='api_key' type='password' placeholder='sk-proj-tghRGo3dGkedvb63FG1dgl' />
+              </div>
+            </fieldset>
+          </form>
+          <AlertDialogFooter>
+            <AlertDialogAction>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <Button
         variant='outline'
         size='sm'
-        className='ml-auto gap-1.5 text-sm'
+        className='ml-auto gap-1.5 text-sm md:hidden'
       >
         <Code className='size-3.5' />
         Code
