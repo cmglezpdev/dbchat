@@ -1,10 +1,10 @@
 import { DbDesign } from '@/types'
 
 export class Prompts {
-  static organizeRequirementsPrompt(requirements: string): string {
+  static organizeRequirementsPrompt(requirements: string, database: string): string {
     return `
       Dado los requerimientos de software siguentes de una aplicación, analiza detalladamente el texto y organiza las ideas en un texto coherente en donde tenga toda la información proporcionada por el ususario.
-      Debido a que los requeriemientos son para diseñar una base de datos relacional, no incluyas información innecesaria que no aporte nada al diseño de la misma.       
+      Debido a que los requeriemientos son para diseñar una base de datos ${database}, no incluyas información innecesaria que no aporte nada al diseño de la misma.       
   
       REQUERIMIENTOS DEL USUARIO:
       ${requirements}
@@ -13,7 +13,7 @@ export class Prompts {
     `
   }
 
-  static databaseDesignPrompt(requirements: string, database: string = 'postgres'): string {
+  static databaseDesignPrompt(requirements: string, database: string, styles?: string): string {
     return `
       Dado los requerimientos de una aplicación, los cuales mencionan el funcionamiento principal de la misma y un conjunto de características que describen a la aplicación,
       tu tarea es extraer el conjunto de entidades, propiedades y relaciones que intervienen en un diseño de una base de datos ${database} que modele la aplicación. 
@@ -25,6 +25,8 @@ export class Prompts {
       - Los primery keys de las entidades deben ser llamados solo como id siempre que sea posible.
       - Los nombres de las entidades deben ser en plurar
       - Todos los nombres de las entidades, propiedades y demas deben estar en ingles
+
+      ${styles ? `Al diseñar la base de datos ten en cuenta los estilos y lineamientos de diseño establecidos por el usuario:\n${styles}` : ''}
       
       -------------------------------------
       Ejemplos:
@@ -111,7 +113,7 @@ export class Prompts {
     `
   }
 
-  static extendDatabaseDesignPrompt(requirements: string, databaseDesign: string): string {
+  static extendDatabaseDesignPrompt(requirements: string, databaseDesign: string, styles?: string): string {
     return `
       Dado los requerimientos de una aplicación y un primer diseño de una base de datos relacional que modele dicha aplicación, tu tarea es analizar detalladamente los requerimientos del usuario y el diseño de la base de datos que se dió.
       Utiliza tus conocimientos relacionados con el tipo de aplicación y añade entidades importantes con sus correspondientes propiedades y relaciones que sean importantes para el diseño de la aplicación y no hallan sido añadidas.
@@ -126,6 +128,8 @@ export class Prompts {
       En ambos casos mantén una consistencia en los nombres de las entidades y propiedades
       - Mantén el mismo formato que el diseño de base de datos proporcionado.
   
+      ${styles ? `Al diseñar la base de datos ten en cuenta los estilos y lineamientos de diseño establecidos por el usuario:\n${styles}` : ''}
+      
       -------------------------------------
       Ejemplos:
       - Requerimientos: Quiero desarrollar una red social en donde los usuario puedan interactuar con otros usuarios mediante la creación de posts. Los usuarios pueden dar like y comentar tambien las publicaciones, además que los usuarios pueden seguir a otros usuarios.
@@ -292,19 +296,27 @@ export class Prompts {
     `
   }
 
-  static updateSQLDesignPrompt(jsonDbDesign: DbDesign, sqlDbDesign: string, changes: string, database: string) {
+  static updateSQLDesignPrompt(oldJsonDesign: DbDesign, newJsonDesign: DbDesign, oldSqlDbDesign: string, changes: string, database: string) {
     return `
-      Dado el siguiente esquema de una base de datos ${database}, actualiza el esquema según los siguientes cambios:
+      Dado el siguiente esquema en formato json de una base de datos ${database}, la cual fue actualizada a una nueva versión realizando un conjunto de cambios,
+      y un esquema anterior de la base de datos en sql referente a la primera versión de la misma, genere una nueva versión sql del esquema nuevo siguiendo detalladamente los cambios
+      hechos del esquema viejo al nuevo y siguiendo detalladamente la descripción de los cambios hechos y tomamando como base el esquema en sql del diseño previo.
+
+      NO generes texto ni nada extra, solo devuelve el sql de la nueva versión de la base de datos que  mejor describe la nueva versión con los cambios realizados.
+
+      DISEÑO ANTERIOR DE LA BASE DE DATOS EN FORMATO JSON:
+      ${JSON.stringify(oldJsonDesign)}
+
+      DISEÑO NUEVO DE LA BASE DE DATOS EN FORMATO JSON:
+      ${JSON.stringify(newJsonDesign)}
+
+      EXPLICACIÓN DETALLADA DE LOS CAMBIOS REALIZADOS ENTRE UNA VERSIÓN Y LA OTRA:
       ${changes}
-      Devuelve solo el esquema actualizado en formato sql respetando el mismo formato, propiedades, nombres, etc.
-  
-      ESQUEMA DE BASE DE DATOS EN FORMATO JSON:
-      ${JSON.stringify(jsonDbDesign)}
-  
-      ESQUEMA DE BASE DE DATOS EN FORMATO SQL:
-      ${sqlDbDesign}
-  
-      TU RESPUESTA:
+
+      COMANDOS SQL DE LA VERSIÓN ANTIGUA DE LA BASE DE DATOS:
+      ${oldSqlDbDesign}
+      
+      COMMANDOS SQL DE LA VERSIÓM NUEVA DE LA BASE DE DATOS:
     `
   }
 

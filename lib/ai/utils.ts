@@ -7,12 +7,12 @@ import { Prompts } from './prompts'
 
 export async function generateDbDesign(input: string, config: Config) {
   const requirements = await textLLMQuery(
-    Prompts.organizeRequirementsPrompt(input),
+    Prompts.organizeRequirementsPrompt(input, config.database),
     config
   )
 
   const firstDesign = await objectLLMQuery(
-    Prompts.databaseDesignPrompt(requirements),
+    Prompts.databaseDesignPrompt(requirements, config.database),
     dbDesignSchema,
     config
   )
@@ -51,7 +51,7 @@ export async function updateDbDesign(input: string, jsonSchema: DbDesign, sqlSch
 
   console.log('Generating new sql design')
   const newSqlSchema = await textLLMQuery(
-    Prompts.updateSQLDesignPrompt(newSchema, sqlSchema, changes, config.database),
+    Prompts.updateSQLDesignPrompt(jsonSchema, newSchema, sqlSchema, changes, config.database),
     config
   )
 
