@@ -1,8 +1,4 @@
-export type ChatMessage = {
-  id: number;
-  role: 'user' | 'system',
-  content: string
-}
+import { Message } from 'ai'
 
 export type Entity = {
   name: string;
@@ -16,4 +12,17 @@ export type Entity = {
 
 export type DbDesign = {
   design: Entity[];
+}
+
+export type Config = {
+  model: string;
+  apiKey: string;
+  database?: string;
+}
+
+export type BodyType = {
+  message: Message,
+  jsonDesign: DbDesign
+  sqlDesign: string
+  config: Config
 }

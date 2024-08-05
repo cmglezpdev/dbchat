@@ -1,5 +1,4 @@
 import { DbDesign } from '@/types'
-import * as z from 'zod'
 
 export function organizeRequirementsPrompt(requirements: string): string {
   return `
@@ -323,22 +322,6 @@ export function getDbDesignDescriptionPrompt(design: DbDesign, requirements: str
       TU RESPUESTA:
     `
 }
-
-export const dbDesignSchema = z.object({
-  design: z.array(
-    z.object({
-      name: z.string(),
-      attributes: z.array(z.string()),
-      primary_keys: z.array(z.string()),
-      foreign_keys: z.array(
-        z.object({
-          id: z.string(),
-          reference: z.string()
-        })
-      )
-    })
-  )
-})
 
 // Quiero crear una aplicación de chat en la que los usuarios puedan enviar mensajes entre ellos y que estén asociados a una sala de chat.
 // Los usuarios pueden tener conversaciones con otros usuarios sólo si son amigos.

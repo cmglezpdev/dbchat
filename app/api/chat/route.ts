@@ -1,55 +1,26 @@
-import { z, ZodSchema } from 'zod'
 import { generateObject, generateText, Message } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
+import { BodyType, Config, DbDesign } from '@/types'
+import { ApiChatSchema, dbDesignSchema } from '@/lib/schemas'
 import {
   organizeRequirementsPrompt,
   databaseDesignPrompt,
-  dbDesignSchema,
   extendDatabaseDesignPrompt,
   updateDatabasePrompt,
   generateDescriptionAboutDbChanges,
   generateSQLCommandsPrompt,
   updateSQLDesignPrompt
 } from '@/lib/ai'
-import { DbDesign } from '@/types'
+import { ZodSchema } from 'zod'
 
 export const maxDuration = 30
-
 const PROMPTS_HISTORY: Message[] = []
-
-const postSchema = z.object({
-  message: z.object({
-    id: z.string(),
-    role: z.string(),
-    content: z.string()
-  }),
-  jsonDesign: dbDesignSchema.nullable().optional(),
-  sqlDesign: z.string().nullable().optional(),
-  config: z.object({
-    model: z.string(),
-    apiKey: z.string(),
-    database: z.string().nullable().optional()
-  })
-})
-
-type Config = {
-  model: string;
-  apiKey: string;
-  database?: string;
-}
-
-type BodyType = {
-  message: Message,
-  jsonDesign: DbDesign
-  sqlDesign: string
-  config: Config
-}
 
 export async function POST(req: Request) {
   const body: BodyType = await req.json()
   const { message, jsonDesign, sqlDesign, config } = body
 
-  const isValid = postSchema.safeParse(body)
+  const isValid = ApiChatSchema.safeParse(body)
   if (!isValid.success) {
     console.error('Bad request.')
     return new Response(JSON.stringify(isValid.error.errors), { status: 400 })
