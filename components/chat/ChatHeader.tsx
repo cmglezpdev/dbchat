@@ -2,17 +2,61 @@ import { Settings, Code } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
-import { OpenAIIcon } from '../icons'
+import { MariaDBIcon, MySQLIcon, OpenAIIcon, PostgreSQLIcon, SQLiteIcon } from '../icons'
 import { ChatDbDesigns } from './ChatDbDesigns'
 import { useConfigStore, useDesignStore } from '@/store'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select'
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerClose, DrawerFooter } from '../ui/drawer'
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet'
+import { MicrosoftSQLServerIcon } from '../icons/MySqlServer'
+
+export const configOptions = {
+  models: [
+    {
+      platform: 'OpenAI',
+      name: 'GPT-4o mini',
+      value: 'gpt-4o-mini',
+      icon: <OpenAIIcon className='size-5' />
+    },
+    {
+      platform: 'OpenAI',
+      name: 'GPT-4o',
+      value: 'gpt-4o',
+      icon: <OpenAIIcon className='size-5' />
+    }
+  ],
+  databases: [
+    {
+      name: 'PostgreSQL',
+      value: 'postgresql',
+      icon: <PostgreSQLIcon className='size-5' />
+    },
+    {
+      name: 'SQLite',
+      value: 'sqlite',
+      icon: <SQLiteIcon className='size-5' />
+    },
+    {
+      name: 'MySQL',
+      value: 'mysql',
+      icon: <MySQLIcon className='size-5' />
+    },
+    {
+      name: 'MariaDB',
+      value: 'mariadb',
+      icon: <MariaDBIcon className='size-5' />
+    },
+    {
+      name: 'MySQL Server',
+      value: 'mysql-server',
+      icon: <MicrosoftSQLServerIcon className='size-5' />
+    }
+  ]
+}
 
 export function ChatHeader() {
   const { jsonDesign, sqlDesign } = useDesignStore()
-  const { model, apiKey, setApiKey, setModel } = useConfigStore()
 
   return (
     <header className='sticky top-0 z-10 flex h-[57px] items-center gap-1 border-b bg-background px-4'>
@@ -33,54 +77,7 @@ export function ChatHeader() {
               Configure the settings for the model and messages.
             </DrawerDescription>
           </DrawerHeader>
-          <form className='grid w-full items-start gap-6 overflow-auto p-4 pt-0'>
-            <fieldset className='grid gap-6 rounded-lg border p-4'>
-              <legend className='-ml-1 px-1 text-sm font-medium'>
-                Settings
-              </legend>
-              <div className='grid gap-3'>
-                <Label htmlFor='model'>Model</Label>
-                <Select onValueChange={(value) => setModel(value)} value={model}>
-                  <SelectTrigger
-                    id='model'
-                    className='items-start [&_[data-description]]:hidden'
-                  >
-                    <SelectValue placeholder='Select a model' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='gpt-4o-mini'>
-                      <div className='flex items-start gap-3 text-muted-foreground'>
-                        <div className='flex items-center'>
-                          <OpenAIIcon className='size-5' />
-                        </div>
-                        <div className='grid gap-0.5'>
-                          <p>
-                            OpenAI{' '}
-                            <span className='font-medium text-foreground'>
-                              GPT-4o mini
-                            </span>
-                          </p>
-                          <p className='text-xs' data-description>
-                            Our most cost-efficient small model
-                          </p>
-                        </div>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className='grid gap-3'>
-                <Label htmlFor='api_key'>Api Key</Label>
-                <Input
-                  id='api_key'
-                  type='password'
-                  placeholder='sk-proj-tghRGo3dGkedvb63FG1dgl'
-                  onChange={(e) => setApiKey(e.target.value)}
-                  value={apiKey ?? ''}
-                />
-              </div>
-            </fieldset>
-          </form>
+          <HeaderSettings />
           <DrawerFooter className='flex items-end justify-end'>
             <DrawerClose asChild className='max-w-min'>
               <Button>Continue</Button>
@@ -104,54 +101,7 @@ export function ChatHeader() {
               Configure the settings for the model and messages.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <form className='grid w-full items-start gap-6 overflow-auto p-4 pt-0'>
-            <fieldset className='grid gap-6 rounded-lg border p-4'>
-              <legend className='-ml-1 px-1 text-sm font-medium'>
-                Settings
-              </legend>
-              <div className='grid gap-3'>
-                <Label htmlFor='model'>Model</Label>
-                <Select onValueChange={(value) => setModel(value)} value={model}>
-                  <SelectTrigger
-                    id='model'
-                    className='items-start [&_[data-description]]:hidden'
-                  >
-                    <SelectValue placeholder='Select a model' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='gpt-4o-mini'>
-                      <div className='flex items-start gap-3 text-muted-foreground'>
-                        <div className='flex items-center'>
-                          <OpenAIIcon className='size-5' />
-                        </div>
-                        <div className='grid gap-0.5'>
-                          <p>
-                            OpenAI{' '}
-                            <span className='font-medium text-foreground'>
-                              GPT-4o mini
-                            </span>
-                          </p>
-                          <p className='text-xs' data-description>
-                            Our most cost-efficient small model
-                          </p>
-                        </div>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className='grid gap-3'>
-                <Label htmlFor='api_key'>Api Key</Label>
-                <Input
-                  id='api_key'
-                  type='password'
-                  placeholder='sk-proj-tghRGo3dGkedvb63FG1dgl'
-                  onChange={(e) => setApiKey(e.target.value)}
-                  value={apiKey ?? ''}
-                />
-              </div>
-            </fieldset>
-          </form>
+          <HeaderSettings />
           <AlertDialogFooter>
             <AlertDialogAction>Continue</AlertDialogAction>
           </AlertDialogFooter>
@@ -181,5 +131,93 @@ export function ChatHeader() {
         </SheetContent>
       </Sheet>
     </header>
+  )
+}
+
+
+
+function HeaderSettings() {
+  const { model, apiKey, database, setApiKey, setModel, setDatabase } = useConfigStore()
+
+  return (
+    <form className='grid w-full items-start gap-6 overflow-auto p-4 pt-0'>
+      <fieldset className='grid gap-6 rounded-lg border p-4'>
+        <legend className='-ml-1 px-1 text-sm font-medium'>
+          Settings
+        </legend>
+        {/* Model */}
+        <div className='grid gap-3'>
+          <Label htmlFor='model'>Model</Label>
+          <Select onValueChange={(value) => setModel(value)} value={model}>
+            <SelectTrigger
+              id='model'
+              className='items-start [&_[data-description]]:hidden'
+            >
+              <SelectValue placeholder='Select a model' />
+            </SelectTrigger>
+            <SelectContent>
+              {configOptions.models.map(model => (
+                <SelectItem key={model.value} value={model.value}>
+                  <div className='flex items-start gap-3 text-muted-foreground'>
+                    <div className='flex items-center'>
+                      {model.icon}
+                    </div>
+                    <div className='grid gap-0.5'>
+                      <p>
+                        {model.platform}{' '}
+                        <span className='font-medium text-foreground'>
+                          {model.name}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Database */}
+        <div className='grid gap-3'>
+          <Label htmlFor='database'>Database</Label>
+          <Select onValueChange={(value) => setDatabase(value)} value={database}>
+            <SelectTrigger
+              id='database'
+              className='items-start [&_[data-description]]:hidden'
+            >
+              <SelectValue placeholder='Select a database' />
+            </SelectTrigger>
+            <SelectContent>
+              {configOptions.databases.map(database => (
+                <SelectItem key={database.value} value={database.value}>
+                  <div className='flex items-start gap-3 text-muted-foreground py-1'>
+                    <div className='flex items-center'>
+                      {database.icon}
+                    </div>
+                    <div className='grid gap-0.5'>
+                      <span className='font-medium text-foreground'>
+                        {database.name}
+                      </span>
+                    </div>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Api Key */}
+        <div className='grid gap-3'>
+          <Label htmlFor='api_key'>Api Key</Label>
+          <Input
+            id='api_key'
+            type='password'
+            placeholder='sk-proj-tghRGo3dGkedvb63FG1dgl'
+            onChange={(e) => setApiKey(e.target.value)}
+            value={apiKey ?? ''}
+          />
+        </div>
+      </fieldset>
+    </form>
   )
 }

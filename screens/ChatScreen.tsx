@@ -1,14 +1,18 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { Message } from 'ai/react'
+import { useEffect, useState } from 'react'
 import { ChatHistory, ChatInputMessage, ChatDbDesigns } from '@/components/chat'
 import { useConfigStore, useDesignStore } from '@/store'
 import { useToast } from '@/components/ui/use-toast'
 
 export function ChatScreen() {
   const { jsonDesign, setJsonDesign, setSqlDesign, sqlDesign } = useDesignStore()
-  const config = useConfigStore((store) => ({ model: store.model, apiKey: store.apiKey }))
+  const config = useConfigStore((store) => ({
+    model: store.model,
+    apiKey: store.apiKey,
+    database: store.database
+  }))
   const { toast } = useToast()
   const [isLoading, setLoading] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
