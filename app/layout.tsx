@@ -1,10 +1,11 @@
 import React from 'react'
 import type { Metadata } from 'next'
 import { Inter as FontSans } from 'next/font/google'
-import './globals.css'
-import { cn } from '@/lib/utils'
-import { TooltipProvider } from '@radix-ui/react-tooltip'
+import { Analytics } from '@vercel/analytics/react'
 import { Toaster } from '@/components/ui/toaster'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { cn } from '@/lib/utils'
+import './globals.css'
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -33,6 +34,7 @@ export default function RootLayout({
           {children}
         </TooltipProvider>
         <Toaster />
+        <Analytics />
       </body>
     </html>
   )
