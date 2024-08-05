@@ -1,6 +1,6 @@
 export * from './DatabaseOff'
 export * from './TableOff'
-export * from './OpenAIx'
+export * from './OpenAI'
 export * from './ClaudeAI'
 
 export * from './MariaDB'
