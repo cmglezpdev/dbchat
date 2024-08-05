@@ -2,7 +2,7 @@ import { Settings, Code } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
-import { ClaudeAIIcon, MariaDBIcon, MySQLIcon, OpenAIIcon, PostgreSQLIcon, SQLiteIcon } from '../icons'
+import { MariaDBIcon, MySQLIcon, OpenAIIcon, PostgreSQLIcon, SQLiteIcon } from '../icons'
 import { ChatDbDesigns } from './ChatDbDesigns'
 import { useConfigStore, useDesignStore } from '@/store'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select'
@@ -24,7 +24,7 @@ export const configOptions = {
       name: 'GPT-4o',
       value: 'gpt-4o',
       icon: <OpenAIIcon className='size-5' />
-    },
+    }
     // {
     //   platform: 'Anthropic',
     //   name: 'Claude 3.5 Sonnet',
@@ -157,8 +157,6 @@ export function ChatHeader() {
     </header>
   )
 }
-
-
 
 function HeaderSettings() {
   const { model, apiKey, database, setApiKey, setModel, setDatabase } = useConfigStore()
