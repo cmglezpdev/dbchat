@@ -3,28 +3,28 @@ import { ZodSchema } from 'zod'
 import { Config, DbDesign } from '@/types'
 import { generateText, generateObject } from 'ai'
 import { dbDesignSchema } from '../schemas'
-import { organizeRequirementsPrompt, databaseDesignPrompt, extendDatabaseDesignPrompt, generateSQLCommandsPrompt, updateDatabasePrompt, generateDescriptionAboutDbChanges, updateSQLDesignPrompt } from './prompts'
+import { Prompts } from './prompts'
 
 export async function generateDbDesign(input: string, config: Config) {
   const requirements = await textLLMQuery(
-    organizeRequirementsPrompt(input),
+    Prompts.organizeRequirementsPrompt(input),
     config
   )
 
   const firstDesign = await objectLLMQuery(
-    databaseDesignPrompt(requirements),
+    Prompts.databaseDesignPrompt(requirements),
     dbDesignSchema,
     config
   )
 
   const extendedDesign = await objectLLMQuery(
-    extendDatabaseDesignPrompt(requirements, JSON.stringify(firstDesign)),
+    Prompts.extendDatabaseDesignPrompt(requirements, JSON.stringify(firstDesign)),
     dbDesignSchema,
     config
   )
 
   const sqlSchema = await textLLMQuery(
-    generateSQLCommandsPrompt(extendedDesign),
+    Prompts.generateSQLCommandsPrompt(extendedDesign, config.database),
     config
   )
 
@@ -38,20 +38,20 @@ export async function generateDbDesign(input: string, config: Config) {
 export async function updateDbDesign(input: string, jsonSchema: DbDesign, sqlSchema: string, config: Config) {
   console.log('Generation new json design')
   const newSchema = await objectLLMQuery(
-    updateDatabasePrompt(jsonSchema, input),
+    Prompts.updateDatabasePrompt(jsonSchema, input),
     dbDesignSchema,
     config
   )
 
   console.log('Generating changes description')
   const changes = await textLLMQuery(
-    generateDescriptionAboutDbChanges(newSchema, newSchema, input),
+    Prompts.generateDescriptionAboutDbChanges(newSchema, newSchema, input),
     config
   )
 
   console.log('Generating new sql design')
   const newSqlSchema = await textLLMQuery(
-    updateSQLDesignPrompt(newSchema, sqlSchema, changes),
+    Prompts.updateSQLDesignPrompt(newSchema, sqlSchema, changes, config.database),
     config
   )
 

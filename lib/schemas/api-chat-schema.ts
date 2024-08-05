@@ -12,6 +12,6 @@ export const ApiChatSchema = z.object({
   config: z.object({
     model: z.string(),
     apiKey: z.string(),
-    database: z.string().nullable().optional()
+    database: z.string()
   })
 })
