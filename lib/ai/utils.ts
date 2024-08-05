@@ -45,7 +45,7 @@ export async function updateDbDesign(input: string, jsonSchema: DbDesign, sqlSch
 
   console.log('Generating changes description')
   const changes = await textLLMQuery(
-    Prompts.generateDescriptionAboutDbChanges(newSchema, newSchema, input),
+    Prompts.generateDescriptionAboutDbChanges(jsonSchema, newSchema, input),
     config
   )
 
