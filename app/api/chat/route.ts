@@ -3,7 +3,7 @@ import { ApiChatSchema } from '@/lib/schemas'
 import { BodyType } from '@/types'
 import { Message } from 'ai'
 
-export const maxDuration = 30
+export const maxDuration = 60
 const PROMPTS_HISTORY: Message[] = []
 
 export async function POST(req: Request) {
