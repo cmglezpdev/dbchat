@@ -2,82 +2,13 @@ import { Settings, Code } from 'lucide-react'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
-import { MariaDBIcon, MySQLIcon, OpenAIIcon, PostgreSQLIcon, SQLiteIcon } from '../icons'
 import { ChatDbDesigns } from './ChatDbDesigns'
 import { useConfigStore, useDesignStore } from '@/store'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select'
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerClose, DrawerFooter } from '../ui/drawer'
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet'
-import { MicrosoftSQLServerIcon } from '../icons/MySqlServer'
-
-export const configOptions = {
-  models: [
-    {
-      platform: 'OpenAI',
-      name: 'GPT-4o mini',
-      value: 'gpt-4o-mini',
-      icon: <OpenAIIcon className='size-5' />
-    },
-    {
-      platform: 'OpenAI',
-      name: 'GPT-4o',
-      value: 'gpt-4o',
-      icon: <OpenAIIcon className='size-5' />
-    }
-    // {
-    //   platform: 'Anthropic',
-    //   name: 'Claude 3.5 Sonnet',
-    //   value: 'claude-3-5-sonnet-20240620',
-    //   icon: <ClaudeAIIcon className='size-5' />
-    // },
-    // {
-    //   platform: 'Anthropic',
-    //   name: 'Claude 3 Opus',
-    //   value: 'claude-3-opus-20240229',
-    //   icon: <ClaudeAIIcon className='size-5' />
-    // },
-    // {
-    //   platform: 'Anthropic',
-    //   name: 'Claude 3 Sonnet',
-    //   value: 'claude-3-sonnet-20240229',
-    //   icon: <ClaudeAIIcon className='size-5' />
-    // },
-    // {
-    //   platform: 'Anthropic',
-    //   name: 'Claude 3 Haiku',
-    //   value: 'claude-3-haiku-20240307',
-    //   icon: <ClaudeAIIcon className='size-5' />
-    // }
-  ],
-  databases: [
-    {
-      name: 'PostgreSQL',
-      value: 'postgresql',
-      icon: <PostgreSQLIcon className='size-5' />
-    },
-    {
-      name: 'SQLite',
-      value: 'sqlite',
-      icon: <SQLiteIcon className='size-5' />
-    },
-    {
-      name: 'MySQL',
-      value: 'mysql',
-      icon: <MySQLIcon className='size-5' />
-    },
-    {
-      name: 'MariaDB',
-      value: 'mariadb',
-      icon: <MariaDBIcon className='size-5' />
-    },
-    {
-      name: 'MySQL Server',
-      value: 'mysql-server',
-      icon: <MicrosoftSQLServerIcon className='size-5' />
-    }
-  ]
-}
+import { providerOptions } from '@/lib/ai/providers'
 
 export function ChatHeader() {
   const { jsonDesign, sqlDesign } = useDesignStore()
@@ -178,17 +109,17 @@ function HeaderSettings() {
               <SelectValue placeholder='Select a model' />
             </SelectTrigger>
             <SelectContent>
-              {configOptions.models.map(model => (
-                <SelectItem key={model.value} value={model.value}>
+              {providerOptions.providers.map(option => (
+                <SelectItem key={option.model} value={option.model}>
                   <div className='flex items-start gap-3 text-muted-foreground'>
                     <div className='flex items-center'>
-                      {model.icon}
+                      {option.icon}
                     </div>
                     <div className='grid gap-0.5'>
                       <p>
-                        {model.platform}{' '}
+                        {option.provider}{' '}
                         <span className='font-medium text-foreground'>
-                          {model.name}
+                          {option.name}
                         </span>
                       </p>
                     </div>
@@ -210,7 +141,7 @@ function HeaderSettings() {
               <SelectValue placeholder='Select a database' />
             </SelectTrigger>
             <SelectContent>
-              {configOptions.databases.map(database => (
+              {providerOptions.databases.map(database => (
                 <SelectItem key={database.value} value={database.value}>
                   <div className='flex items-start gap-3 text-muted-foreground py-1'>
                     <div className='flex items-center'>
