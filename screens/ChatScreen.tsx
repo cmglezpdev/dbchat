@@ -19,6 +19,7 @@ export function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState<string>('')
 
+  const designSectionRef = useRef<HTMLDivElement>(null)
   const chatSectionRef = useRef<HTMLDivElement>(null)
   const chatInputRef = useRef<HTMLFormElement>(null)
   const chatHistoryRef = useRef<HTMLDivElement>(null)
@@ -38,7 +39,7 @@ export function ChatScreen() {
   // Update ui height
   useEffect(() => {
     const adjustHeight = () => {
-      if (chatSectionRef.current && chatInputRef.current && chatHistoryRef.current) {
+      if (chatSectionRef.current && chatInputRef.current && chatHistoryRef.current && designSectionRef.current) {
         const availableHeight = window.innerHeight
         const chatSectionRect = chatSectionRef.current.getBoundingClientRect()
         const maxChatSectionHeight = availableHeight - chatSectionRect.top - 16
@@ -46,6 +47,9 @@ export function ChatScreen() {
 
         chatSectionRef.current.style.height = `${maxChatSectionHeight}px`
         chatSectionRef.current.style.maxHeight = `${maxChatSectionHeight}px`
+
+        designSectionRef.current.style.height = `${maxChatSectionHeight}px`
+        designSectionRef.current.style.maxHeight = `${maxChatSectionHeight}px`
 
         const historyHeight = maxChatSectionHeight - inputHeight
         chatHistoryRef.current.style.height = `${historyHeight}px`
@@ -141,7 +145,10 @@ export function ChatScreen() {
   return (
     <main className='grid flex-1 gap-4 h-screen md:grid-cols-2 p-4'>
       {/* Chat Settings */}
-      <div className='relative hidden flex-col items-start gap-8 md:flex'>
+      <div
+        className='relative hidden flex-col items-start gap-8 md:flex'
+        ref={designSectionRef}
+      >
         <ChatDbDesigns
           jsonDesign={jsonDesign}
           sqlDesign={sqlDesign}
