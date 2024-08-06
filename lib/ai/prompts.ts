@@ -269,8 +269,10 @@ export class Prompts {
   static generateDescriptionAboutDbChanges(prevDbDesign: object, newDbDesign: object, changesRequired: string) {
     return `
       Dado los cambios requeridos por un usuario, la versión previa de la base de datos y la versión nueva con los cambios hechos, genérame una descripción detalla de los cambios que se hicieron al diseño de la base de datos.
-      El diseño de la base de datos está en formato JSON y los cambios requeridos es el input del usuario:
-      
+      - El diseño de la base de datos está en formato JSON y los cambios requeridos es el input del usuario. 
+      - No me devuelvas en la descripción algún tipo de diseño, json, código u otra cosa, solo devuelve la explicación en lenguage natural de los cambios realizados.
+      - Al mensionar el nombre de alguna entidad o propiedad de los diseños, no traduzcas el nombre, refierete a ellos con su mismo nombre. 
+
       CAMBIOS REQUERIDOS POR EL USUARIO
       ${changesRequired}
   
@@ -324,7 +326,10 @@ export class Prompts {
     return `
         Dado el siguiente esquema que representa la modelación de una base de datos para una aplicación con unos requerimientos específicos. 
         Tu tarea es generar una descripción coherente de dicha modelación que explique en que consiste el modelo creado y como resulve los requerimientos del usuario.
-        Solo responde con la información necesaria. NO añadas text adicional para adornar la respuesta.
+        - Solo responde con la información necesaria. NO añadas text adicional para adornar la respuesta.
+        - No me devuelvas en la descripción algún tipo de diseño, json, código u otra cosa, solo devuelve la explicación en lenguage natural de los cambios realizados.
+        - Al mensionar el nombre de alguna entidad o propiedad de los diseños, no traduzcas el nombre, refierete a ellos con su mismo nombre. 
+
         
         REQUERIMIENTOS DE LA APLICACIÓN:
         ${requirements}
@@ -336,7 +341,3 @@ export class Prompts {
       `
   }
 }
-
-// Quiero crear una aplicación de chat en la que los usuarios puedan enviar mensajes entre ellos y que estén asociados a una sala de chat.
-// Los usuarios pueden tener conversaciones con otros usuarios sólo si son amigos.
-// Tambien un usuario puede crear un grupo de varias personas en donde todos puedan hablar con todos en una misma sala.
