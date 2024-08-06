@@ -1,7 +1,7 @@
 'use client'
 
 import { Message } from 'ai/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ChatHistory, ChatInputMessage, ChatDbDesigns } from '@/components/chat'
 import { useConfigStore, useDesignStore } from '@/store'
 import { useToast } from '@/components/ui/use-toast'
@@ -18,6 +18,11 @@ export function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState<string>('')
 
+  const chatSectionRef = useRef<HTMLDivElement>(null)
+  const chatInputRef = useRef<HTMLFormElement>(null)
+  const chatHistoryRef = useRef<HTMLDivElement>(null)
+
+  // Set welcome message
   useEffect(() => {
     if (messages.length === 0) {
       const firstMessage: Message = {
@@ -28,6 +33,48 @@ export function ChatScreen() {
       setMessages([firstMessage])
     }
   }, [messages.length, setMessages])
+
+  // Update ui height
+  useEffect(() => {
+    const adjustHeight = () => {
+      if (chatSectionRef.current && chatInputRef.current && chatHistoryRef.current) {
+        const availableHeight = window.innerHeight
+        const chatSectionRect = chatSectionRef.current.getBoundingClientRect()
+        const maxChatSectionHeight = availableHeight - chatSectionRect.top - 16
+        const inputHeight = chatInputRef.current.offsetHeight
+
+        chatSectionRef.current.style.height = `${maxChatSectionHeight}px`
+        chatSectionRef.current.style.maxHeight = `${maxChatSectionHeight}px`
+
+        const historyHeight = maxChatSectionHeight - inputHeight
+        chatHistoryRef.current.style.height = `${historyHeight}px`
+      }
+    }
+
+    adjustHeight()
+
+    const resizeObserver = new ResizeObserver(adjustHeight)
+    if (chatInputRef.current) {
+      resizeObserver.observe(chatInputRef.current)
+    }
+    window.addEventListener('resize', adjustHeight)
+
+    return () => {
+      if (chatInputRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        resizeObserver.unobserve(chatInputRef.current)
+      }
+      window.removeEventListener('resize', adjustHeight)
+    }
+  }, [])
+
+  // scroll in the history
+  useEffect(() => {
+    const divHistory = chatHistoryRef.current
+    if (divHistory) {
+      divHistory.scrollTop = divHistory.scrollHeight
+    }
+  }, [messages])
 
   const handleInputChange = (text: string) => {
     setInput(text)
@@ -91,7 +138,7 @@ export function ChatScreen() {
   }
 
   return (
-    <main className='grid flex-1 gap-4 overflow-auto p-4 md:grid-cols-2'>
+    <main className='grid flex-1 gap-4 h-screen md:grid-cols-2 p-4'>
       {/* Chat Settings */}
       <div className='relative hidden flex-col items-start gap-8 md:flex'>
         <ChatDbDesigns
@@ -100,15 +147,20 @@ export function ChatScreen() {
         />
       </div>
 
-      <div className='relative flex h-full min-h-[50vh] flex-col rounded-xl bg-muted/50 p-4'>
+      <div
+        className='relative flex flex-col gap-4 justify-between rounded-xl bg-muted/50 p-4'
+        ref={chatSectionRef}
+      >
         {/* Chat History */}
         <ChatHistory
+          ref={chatHistoryRef}
           messages={messages}
           isLoading={isLoading}
         />
 
         {/* Box Input Messages */}
         <ChatInputMessage
+          ref={chatInputRef}
           text={input}
           onChange={handleInputChange}
           onSubmit={handleSubmit}
@@ -118,8 +170,3 @@ export function ChatScreen() {
     </main>
   )
 }
-
-// Creame una forma de manejar el registro de usuarios en una pagina, que puedas controlar que el usuario se registra y los dispositivos (o sessiones) que tiene abiertas para poder restringir despues
-
-// =========
-// Quiero crear un systema de pagos para usuarios que use las pasarelas de pago stripe y paypal
