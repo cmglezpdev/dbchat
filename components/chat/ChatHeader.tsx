@@ -9,6 +9,7 @@ import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, Drawer
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '../ui/sheet'
 import { providerOptions } from '@/lib/ai/providers'
+import { Textarea } from '../ui/textarea'
 
 export function ChatHeader() {
   const { jsonDesign, sqlDesign } = useDesignStore()
@@ -49,7 +50,7 @@ export function ChatHeader() {
             <span className='sr-only'>Settings</span>
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent className='max-h-[80vh]'>
+        <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Configuration</AlertDialogTitle>
             <AlertDialogDescription>
@@ -90,7 +91,10 @@ export function ChatHeader() {
 }
 
 function HeaderSettings() {
-  const { model, apiKey, database, setApiKey, setModel, setDatabase } = useConfigStore()
+  const {
+    model, apiKey, database, styles,
+    setApiKey, setModel, setDatabase, setStyles
+  } = useConfigStore()
 
   return (
     <form className='grid w-full items-start gap-6 overflow-auto p-4 pt-0'>
@@ -168,6 +172,21 @@ function HeaderSettings() {
             placeholder='sk-proj-tghRGo3dGkedvb63FG1dgl'
             onChange={(e) => setApiKey(e.target.value)}
             value={apiKey ?? ''}
+          />
+        </div>
+      </fieldset>
+
+      <fieldset className='grid gap-6 rounded-lg border p-4'>
+        <legend className='-ml-1 px-1 text-sm font-medium'>
+          Extra
+        </legend>
+        <div className='grid gap-3'>
+          <Label htmlFor='content'>Database Style</Label>
+          <Textarea
+            id='content'
+            placeholder='short names, all in english, ...'
+            onChange={(e) => setStyles(e.target.value)}
+            value={styles ?? ''}
           />
         </div>
       </fieldset>

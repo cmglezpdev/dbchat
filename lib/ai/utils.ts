@@ -14,19 +14,19 @@ export async function generateDbDesign(input: string, config: Config) {
   )
 
   const firstDesign = await objectLLMQuery(
-    Prompts.databaseDesignPrompt(requirements, config.database),
+    Prompts.databaseDesignPrompt(requirements, config.database, config.styles),
     dbDesignSchema,
     config
   )
 
   const extendedDesign = await objectLLMQuery(
-    Prompts.extendDatabaseDesignPrompt(requirements, JSON.stringify(firstDesign)),
+    Prompts.extendDatabaseDesignPrompt(requirements, firstDesign, config.styles),
     dbDesignSchema,
     config
   )
 
   const sqlSchema = await textLLMQuery(
-    Prompts.generateSQLCommandsPrompt(extendedDesign, config.database),
+    Prompts.generateSQLCommandsPrompt(extendedDesign, config.database, config.styles),
     config
   )
 
@@ -45,7 +45,7 @@ export async function generateDbDesign(input: string, config: Config) {
 export async function updateDbDesign(input: string, jsonSchema: DbDesign, sqlSchema: string, config: Config) {
   console.log('Generation new json design')
   const newSchema = await objectLLMQuery(
-    Prompts.updateDatabasePrompt(jsonSchema, input),
+    Prompts.updateDatabasePrompt(jsonSchema, input, config.styles),
     dbDesignSchema,
     config
   )
@@ -58,7 +58,7 @@ export async function updateDbDesign(input: string, jsonSchema: DbDesign, sqlSch
 
   console.log('Generating new sql design')
   const newSqlSchema = await textLLMQuery(
-    Prompts.updateSQLDesignPrompt(jsonSchema, newSchema, sqlSchema, changes, config.database),
+    Prompts.updateSQLDesignPrompt(jsonSchema, newSchema, sqlSchema, changes, config.database, config.styles),
     config
   )
 

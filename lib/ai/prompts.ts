@@ -127,7 +127,7 @@ export class Prompts {
     `
   }
 
-  static extendDatabaseDesignPrompt(requirements: string, databaseDesign: string, styles?: string): string {
+  static extendDatabaseDesignPrompt(requirements: string, databaseDesign: object, styles?: string): string {
     return `
       Dado los requerimientos de una aplicación y un primer diseño de una base de datos relacional que modele dicha aplicación, tu tarea es analizar detalladamente los requerimientos del usuario y el diseño de la base de datos que se dió.
       Utiliza tus conocimientos relacionados con el tipo de aplicación y añade entidades importantes con sus correspondientes propiedades y relaciones que sean importantes para el diseño de la aplicación y no hallan sido añadidas.
@@ -261,18 +261,20 @@ export class Prompts {
       ${requirements}
   
       DISEÑO DE LA BASE DE DATOS:
-      ${databaseDesign}
+      ${JSON.stringify(databaseDesign)}
     
       TU RESPUESTA:
     `
   }
 
-  static updateDatabasePrompt(dbDesign: DbDesign, changes: string) {
+  static updateDatabasePrompt(dbDesign: DbDesign, changes: string, styles?: string) {
     return `
       Dado el siguiente esquema de una base de datos, actualiza el esquema según los siguientes cambios:
       ${changes}
       Devuelve solo el esquema actualizado en formato json respetando el mismo formato, propiedades, nombres, etc.
   
+      ${styles ? `Al diseñar la base de datos ten en cuenta los estilos y lineamientos de diseño establecidos por el usuario:\n${styles}` : ''}
+
       ESQUEMA DE BASE DE DATOS EN FORMATO JSON:
       ${JSON.stringify(dbDesign)}
   
@@ -300,11 +302,13 @@ export class Prompts {
     `
   }
 
-  static generateSQLCommandsPrompt(jsonDbDesign: DbDesign, database: string) {
+  static generateSQLCommandsPrompt(jsonDbDesign: DbDesign, database: string, styles?: string) {
     return `
       Dado el siguiente esquema de una base de datos ${database}, genera los commandos de sql necesarios para crear todas esas tablas, propiedades y relaciones.
       Devuelve solo el código sql necesario. No añadas ninguna información extra.
   
+      ${styles ? `Al diseñar la base de datos ten en cuenta los estilos y lineamientos de diseño establecidos por el usuario:\n${styles}` : ''}
+
       ESQUEMA DE BASE DE DATOS EN FORMATO JSON:
       ${JSON.stringify(jsonDbDesign)}
   
@@ -312,13 +316,15 @@ export class Prompts {
     `
   }
 
-  static updateSQLDesignPrompt(oldJsonDesign: DbDesign, newJsonDesign: DbDesign, oldSqlDbDesign: string, changes: string, database: string) {
+  static updateSQLDesignPrompt(oldJsonDesign: DbDesign, newJsonDesign: DbDesign, oldSqlDbDesign: string, changes: string, database: string, styles?: string) {
     return `
       Dado el siguiente esquema en formato json de una base de datos ${database}, la cual fue actualizada a una nueva versión realizando un conjunto de cambios,
       y un esquema anterior de la base de datos en sql referente a la primera versión de la misma, genere una nueva versión sql del esquema nuevo siguiendo detalladamente los cambios
       hechos del esquema viejo al nuevo y siguiendo detalladamente la descripción de los cambios hechos y tomamando como base el esquema en sql del diseño previo.
 
       NO generes texto ni nada extra, solo devuelve el sql de la nueva versión de la base de datos que  mejor describe la nueva versión con los cambios realizados.
+
+      ${styles ? `Al diseñar la base de datos ten en cuenta los estilos y lineamientos de diseño establecidos por el usuario:\n${styles}` : ''}
 
       DISEÑO ANTERIOR DE LA BASE DE DATOS EN FORMATO JSON:
       ${JSON.stringify(oldJsonDesign)}

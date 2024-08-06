@@ -11,7 +11,8 @@ export function ChatScreen() {
   const config = useConfigStore((store) => ({
     model: store.model,
     apiKey: store.apiKey,
-    database: store.database
+    database: store.database,
+    styles: store.styles
   }))
   const { toast } = useToast()
   const [isLoading, setLoading] = useState(false)

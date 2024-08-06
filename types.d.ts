@@ -18,6 +18,7 @@ export type Config = {
   model: string;
   apiKey: string;
   database: string;
+  styles?: string;
 }
 
 export type BodyType = {
