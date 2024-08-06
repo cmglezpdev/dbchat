@@ -49,8 +49,15 @@ export async function POST(req: Request) {
         sqlDesign: resp.sqlDesign
       }), { status: 200 })
     } catch (error: any) {
-      const errorMessage = error.data?.error?.message ?? 'Bad Request. Maybe Invalid ApiKey'
-      console.log({ message: errorMessage })
+      let errorMessage = 'Unexpected Error'
+      if (error instanceof Error) {
+        errorMessage = error.message
+      } else
+        if (error instanceof Response) {
+          errorMessage = await error.text()
+        }
+
+      console.error(error)
       return new Response(JSON.stringify({
         message: errorMessage
       }), { status: 400 })
@@ -58,10 +65,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    // design provided. check type of question of the user
-    // TODO:
     console.log('Design provided. Checking type of question.')
-
     const resp = await updateDbDesign(message.content, jsonDesign, sqlDesign, config)
 
     PROMPTS_HISTORY.push({
@@ -92,7 +96,3 @@ export async function POST(req: Request) {
     }), { status: 400 })
   }
 }
-
-// Quiero crear un systema de pagos para usuarios que use las pasarelas de pago stripe y paypal
-// Añade una tabla productos de una tienda con su nombre y precio. Además añade la relación de compra de los productos por los usuarios y los pagos
-// Elimina el description del producto y añade un fullDescription y un shortDescription, un array de images y un price y cost donde cost es el precio base del producto(adquirido por el vendedor) y price es el precio de venta
