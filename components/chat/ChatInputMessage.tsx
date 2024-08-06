@@ -1,7 +1,6 @@
 import React from 'react'
 import { Textarea } from '../ui/textarea'
-import { Button } from '../ui/button'
-import { CornerDownLeft } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { Label } from '../ui/label'
 
 type Props = {
@@ -11,64 +10,70 @@ type Props = {
   disabled?: boolean
 }
 
-export function ChatInputMessage({ text: input, onChange, onSubmit, disabled }: Props) {
-  const hiddenDivRef = React.useRef<HTMLDivElement>(null)
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null)
+const ChatInputMessage = React.forwardRef<HTMLFormElement, Props>(
+  ({ text: input, onChange, onSubmit, disabled }, ref) => {
+    const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
-  React.useEffect(() => {
-    const div = hiddenDivRef.current
-    const textArea = textareaRef.current
+    React.useEffect(() => {
+      const textArea = textareaRef.current
 
-    if (div && textArea) {
-      div.innerText = input
-      textareaRef.current.style.height = `${div.offsetHeight}px`
+      if (textArea) {
+        textareaRef.current.style.height = 'auto'
+        textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
+      }
+    }, [input])
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if ((event.ctrlKey || event.shiftKey) && event.key === 'Enter') {
+        onChange(input + '\n')
+      } else if (event.key === 'Tab') {
+        event.preventDefault()
+        onChange(input + '\t')
+      } else if (event.key === 'Enter' && input.trim().length > 0) {
+        event.preventDefault()
+        onSubmit()
+      }
     }
-  }, [input])
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (event.ctrlKey && event.key === 'Enter') {
-      onChange(input + '\n')
-    } else if (event.key === 'Tab') {
-      event.preventDefault()
-      onChange(input + '\t')
-    } else if (event.key === 'Enter' && input.trim().length > 0) {
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault()
       onSubmit()
     }
-  }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    onSubmit()
+    return (
+      <form
+        className='overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring flex gap-2 items-end'
+        ref={ref}
+        onSubmit={handleSubmit}
+      >
+        <Label htmlFor='message' className='sr-only'>
+          Message
+        </Label>
+        <Textarea
+          id='message'
+          ref={textareaRef}
+          value={input}
+          onChange={event => onChange(event.target.value)}
+          onKeyDown={handleKeyDown}
+          rows={1}
+          autoFocus
+          spellCheck
+          autoComplete='on'
+          placeholder='Necesito generar algo cool para mi panadería...'
+          className='min-h-[70px] max-h-[300px] resize-none overflow-hidden bottom-0 outline-none border-none'
+          disabled={disabled}
+        />
+        <button
+          type='submit'
+          disabled={input.trim().length === 0}
+          className='ml-auto gap-1.5 p-4 bg-primary text-primary-foreground rounded-full mr-2 mb-2'
+        >
+          <ArrowRight className='size-3.5' />
+        </button>
+      </form>
+    )
   }
+)
 
-  return (
-    <form
-      className='overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring flex items-end'
-      onSubmit={handleSubmit}
-    >
-      <div ref={hiddenDivRef} className='hidden' />
-      <Label htmlFor='message' className='sr-only'>
-        Message
-      </Label>
-      <Textarea
-        id='message'
-        ref={textareaRef}
-        value={input}
-        onChange={event => onChange(event.target.value)}
-        onKeyDown={handleKeyDown}
-        rows={1}
-        autoFocus
-        spellCheck
-        autoComplete='on'
-        placeholder='Type your message here...'
-        className='resize-none border-0 p-3 shadow-none focus-visible:ring-0'
-        disabled={disabled}
-      />
-      <Button type='submit' disabled={input.trim().length === 0} size='sm' className='ml-auto gap-1.5'>
-        Send
-        <CornerDownLeft className='size-3.5' />
-      </Button>
-    </form>
-  )
-}
+ChatInputMessage.displayName = 'ChatInputMessage'
+export { ChatInputMessage }
