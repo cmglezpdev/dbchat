@@ -13,6 +13,22 @@ export class Prompts {
     `
   }
 
+  static updateRequirementsPrompt(userRequirements: string, databaseDesign: object): string {
+    return `
+      Dado una descripción de los requerimientos para el diseño de una base de datos para una aplicación y el diseño creado, tu tarea actualizar dichos requerimientos, cambiando el nombre de las entidades y propiedades mensionadas por las definidas en el diseño hecho.
+
+      REQUERIMIENTOS DEL USUARIO:
+      ---------------------------
+      ${userRequirements}
+      ---------------------------
+      
+      DISEÑO DE LA BASE DE DATOS:
+      ${JSON.stringify(databaseDesign)}
+
+      TU RESPUESTA:
+    `
+  }
+
   static databaseDesignPrompt(requirements: string, database: string, styles?: string): string {
     return `
       Dado los requerimientos de una aplicación, los cuales mencionan el funcionamiento principal de la misma y un conjunto de características que describen a la aplicación,
@@ -23,8 +39,6 @@ export class Prompts {
       - Si la relacion es "many_to_many" entonces crea una nueva entidad que agrupe la relación entre las dos entidadades.
       - Si la relacion es otra entonces añade el id de una tabla como foreign key de la otra tabla.
       - Los primery keys de las entidades deben ser llamados solo como id siempre que sea posible.
-      - Los nombres de las entidades deben ser en plurar
-      - Todos los nombres de las entidades, propiedades y demas deben estar en ingles
 
       ${styles ? `Al diseñar la base de datos ten en cuenta los estilos y lineamientos de diseño establecidos por el usuario:\n${styles}` : ''}
       

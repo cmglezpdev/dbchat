@@ -30,8 +30,13 @@ export async function generateDbDesign(input: string, config: Config) {
     config
   )
 
+  const updRequirements = await textLLMQuery(
+    Prompts.updateRequirementsPrompt(requirements, extendedDesign),
+    config
+  )
+
   return {
-    message: requirements,
+    message: updRequirements,
     jsonDesign: extendedDesign,
     sqlDesign: sqlSchema
   }
