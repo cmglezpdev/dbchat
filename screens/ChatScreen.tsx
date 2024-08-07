@@ -34,8 +34,15 @@ export function ChatScreen() {
         content: data.chatScreen.firstMessage
       }
       setMessages([firstMessage])
+    } else {
+      const [firstMessage, ...restOfMessages] = messages
+      if (firstMessage.content === data.chatScreen.firstMessage) return
+      setMessages([{
+        ...firstMessage,
+        content: data.chatScreen.firstMessage
+      }, ...restOfMessages])
     }
-  }, [messages.length, setMessages, data])
+  }, [messages.length, setMessages, messages, data.chatScreen.firstMessage])
 
   // Update ui height
   useEffect(() => {
