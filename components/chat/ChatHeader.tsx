@@ -3,7 +3,7 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { ChatDbDesigns } from './ChatDbDesigns'
-import { useConfigStore, useDesignStore } from '@/store'
+import { useConfigStore, useDesignStore, useLang } from '@/store'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../ui/select'
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerClose, DrawerFooter } from '../ui/drawer'
 import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog'
@@ -13,10 +13,11 @@ import { Textarea } from '../ui/textarea'
 
 export function ChatHeader() {
   const { jsonDesign, sqlDesign } = useDesignStore()
+  const { data } = useLang(({ data }) => ({ data }))
 
   return (
     <header className='sticky top-0 z-10 flex h-[57px] items-center gap-1 border-b bg-background px-4'>
-      <h1 className='text-xl font-semibold'>Playground</h1>
+      <h1 className='text-xl font-semibold'>{data.header.title}</h1>
 
       {/* Menu in mobile view */}
       <Drawer>
@@ -28,15 +29,15 @@ export function ChatHeader() {
         </DrawerTrigger>
         <DrawerContent className='max-h-[80vh]'>
           <DrawerHeader>
-            <DrawerTitle>Configuration</DrawerTitle>
+            <DrawerTitle>{data.header.configTitle}</DrawerTitle>
             <DrawerDescription>
-              Configure the settings for the model and messages.
+              {data.header.configDescription}
             </DrawerDescription>
           </DrawerHeader>
           <HeaderSettings />
           <DrawerFooter className='flex items-end justify-end'>
             <DrawerClose asChild className='max-w-min'>
-              <Button>Continue</Button>
+              <Button>{data.header.continueButton}</Button>
             </DrawerClose>
           </DrawerFooter>
         </DrawerContent>
@@ -52,14 +53,14 @@ export function ChatHeader() {
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Configuration</AlertDialogTitle>
+            <AlertDialogTitle>{data.header.configTitle}</AlertDialogTitle>
             <AlertDialogDescription>
-              Configure the settings for the model and messages.
+              {data.header.configDescription}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <HeaderSettings />
           <AlertDialogFooter>
-            <AlertDialogAction>Continue</AlertDialogAction>
+            <AlertDialogAction>{data.header.continueButton}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -73,12 +74,12 @@ export function ChatHeader() {
             className='ml-auto gap-1.5 text-sm md:hidden'
           >
             <Code className='size-3.5' />
-            Code
+            {data.chatScreen.dbDesign.designTitle}
           </Button>
         </SheetTrigger>
         <SheetContent side='bottom' className='w-screen h-[90vh]'>
           <SheetHeader>
-            <SheetTitle>Database Design</SheetTitle>
+            <SheetTitle>{data.chatScreen.dbDesign.title}</SheetTitle>
           </SheetHeader>
           <ChatDbDesigns
             jsonDesign={jsonDesign}
@@ -95,16 +96,49 @@ function HeaderSettings() {
     model, apiKey, database, styles,
     setApiKey, setModel, setDatabase, setStyles
   } = useConfigStore()
+  const {
+    lang, setLang, data
+  } = useLang()
 
   return (
     <form className='grid w-full items-start gap-6 overflow-auto p-4 pt-0'>
       <fieldset className='grid gap-6 rounded-lg border p-4'>
         <legend className='-ml-1 px-1 text-sm font-medium'>
-          Settings
+          {data.header.settingsTitle}
         </legend>
+
+        {/* Language */}
+        <div className='grid gap-3'>
+          <Label htmlFor='lang'>{data.header.settingsTitle}</Label>
+          <Select onValueChange={(value) => setLang(value)} value={lang}>
+            <SelectTrigger
+              id='lang'
+              className='items-start [&_[data-description]]:hidden'
+            >
+              <SelectValue placeholder='Select a language' />
+            </SelectTrigger>
+            <SelectContent>
+              {providerOptions.langs.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  <div className='flex items-start gap-3 text-muted-foreground'>
+                    <div className='flex items-center'>
+                      {option.icon}
+                    </div>
+                    <div className='grid gap-0.5'>
+                      <span className='font-medium text-foreground'>
+                        {option.name}
+                      </span>
+                    </div>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Model */}
         <div className='grid gap-3'>
-          <Label htmlFor='model'>Model</Label>
+          <Label htmlFor='model'>{data.header.modelTitle}</Label>
           <Select onValueChange={(value) => setModel(value)} value={model}>
             <SelectTrigger
               id='model'
@@ -136,7 +170,7 @@ function HeaderSettings() {
 
         {/* Database */}
         <div className='grid gap-3'>
-          <Label htmlFor='database'>Database</Label>
+          <Label htmlFor='database'>{data.header.databaseTitle}</Label>
           <Select onValueChange={(value) => setDatabase(value)} value={database}>
             <SelectTrigger
               id='database'
@@ -165,7 +199,7 @@ function HeaderSettings() {
 
         {/* Api Key */}
         <div className='grid gap-3'>
-          <Label htmlFor='api_key'>Api Key</Label>
+          <Label htmlFor='api_key'>{data.header.apiKeyTitle}</Label>
           <Input
             id='api_key'
             type='password'
@@ -178,10 +212,10 @@ function HeaderSettings() {
 
       <fieldset className='grid gap-6 rounded-lg border p-4'>
         <legend className='-ml-1 px-1 text-sm font-medium'>
-          Extra
+          {data.header.extraTitle}
         </legend>
         <div className='grid gap-3'>
-          <Label htmlFor='content'>Database Style</Label>
+          <Label htmlFor='content'>{data.header.databaseStylesTitle}</Label>
           <Textarea
             id='content'
             placeholder='short names, all in english, ...'

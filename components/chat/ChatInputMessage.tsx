@@ -2,6 +2,7 @@ import React from 'react'
 import { Textarea } from '../ui/textarea'
 import { ArrowRight } from 'lucide-react'
 import { Label } from '../ui/label'
+import { useLang } from '@/store'
 
 type Props = {
   text: string;
@@ -12,6 +13,7 @@ type Props = {
 
 const ChatInputMessage = React.forwardRef<HTMLFormElement, Props>(
   ({ text: input, onChange, onSubmit, disabled }, ref) => {
+    const { data } = useLang(({ data }) => ({ data }))
     const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
     React.useEffect(() => {
@@ -59,7 +61,7 @@ const ChatInputMessage = React.forwardRef<HTMLFormElement, Props>(
           autoFocus
           spellCheck
           autoComplete='on'
-          placeholder='Necesito generar algo cool para mi panadería...'
+          placeholder={data.chatScreen.input.placeholder}
           className='min-h-[70px] max-h-[300px] resize-none overflow-hidden bottom-0 outline-none border-none'
           disabled={disabled}
         />

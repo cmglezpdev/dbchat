@@ -3,10 +3,11 @@
 import { Message } from 'ai/react'
 import { useEffect, useRef, useState } from 'react'
 import { ChatHistory, ChatInputMessage, ChatDbDesigns } from '@/components/chat'
-import { useConfigStore, useDesignStore } from '@/store'
+import { useConfigStore, useDesignStore, useLang } from '@/store'
 import { useToast } from '@/components/ui/use-toast'
 
 export function ChatScreen() {
+  const { data } = useLang(({ data }) => ({ data }))
   const { jsonDesign, setJsonDesign, setSqlDesign, sqlDesign } = useDesignStore()
   const config = useConfigStore((store) => ({
     model: store.model,
@@ -30,11 +31,11 @@ export function ChatScreen() {
       const firstMessage: Message = {
         id: crypto.randomUUID(),
         role: 'system',
-        content: 'Hola, cuéntame cuales son los requerimientos de tu aplicación y te ayudaré a modelar una base de datos para tí.'
+        content: data.chatScreen.firstMessage
       }
       setMessages([firstMessage])
     }
-  }, [messages.length, setMessages])
+  }, [messages.length, setMessages, data])
 
   // Update ui height
   useEffect(() => {

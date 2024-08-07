@@ -1,6 +1,23 @@
-import { ClaudeAIIcon, MariaDBIcon, MicrosoftSQLServerIcon, MySQLIcon, OpenAIIcon, PostgreSQLIcon, SQLiteIcon } from '@/components/icons'
+import {
+  ClaudeAIIcon, ESFlagIcon, MariaDBIcon,
+  MicrosoftSQLServerIcon, MySQLIcon,
+  OpenAIIcon, PostgreSQLIcon,
+  SQLiteIcon, UKFlagIcon
+} from '@/components/icons'
 
 export const providerOptions = {
+  langs: [
+    {
+      name: 'English',
+      value: 'en',
+      icon: <UKFlagIcon className='size-5' />
+    },
+    {
+      name: 'Español',
+      value: 'es',
+      icon: <ESFlagIcon className='size-5' />
+    }
+  ],
   providers: [
     {
       provider: 'OpenAI',
