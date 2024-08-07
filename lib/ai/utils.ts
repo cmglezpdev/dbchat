@@ -9,29 +9,29 @@ import { providerOptions } from './providers'
 
 export async function generateDbDesign(input: string, config: Config) {
   const requirements = await textLLMQuery(
-    Prompts.organizeRequirementsPrompt(input, config.database),
+    Prompts(config.lang).organizeRequirementsPrompt(input, config.database),
     config
   )
 
   const firstDesign = await objectLLMQuery(
-    Prompts.databaseDesignPrompt(requirements, config.database, config.styles),
+    Prompts(config.lang).databaseDesignPrompt(requirements, config.database, config.styles),
     dbDesignSchema,
     config
   )
 
   const extendedDesign = await objectLLMQuery(
-    Prompts.extendDatabaseDesignPrompt(requirements, firstDesign, config.styles),
+    Prompts(config.lang).extendDatabaseDesignPrompt(requirements, firstDesign, config.styles),
     dbDesignSchema,
     config
   )
 
   const sqlSchema = await textLLMQuery(
-    Prompts.generateSQLCommandsPrompt(extendedDesign, config.database, config.styles),
+    Prompts(config.lang).generateSQLCommandsPrompt(extendedDesign, config.database, config.styles),
     config
   )
 
   const updRequirements = await textLLMQuery(
-    Prompts.updateRequirementsPrompt(requirements, extendedDesign),
+    Prompts(config.lang).updateRequirementsPrompt(requirements, extendedDesign),
     config
   )
 
@@ -45,20 +45,20 @@ export async function generateDbDesign(input: string, config: Config) {
 export async function updateDbDesign(input: string, jsonSchema: DbDesign, sqlSchema: string, config: Config) {
   console.log('Generation new json design')
   const newSchema = await objectLLMQuery(
-    Prompts.updateDatabasePrompt(jsonSchema, input, config.styles),
+    Prompts(config.lang).updateDatabasePrompt(jsonSchema, input, config.styles),
     dbDesignSchema,
     config
   )
 
   console.log('Generating changes description')
   const changes = await textLLMQuery(
-    Prompts.generateDescriptionAboutDbChanges(jsonSchema, newSchema, input),
+    Prompts(config.lang).generateDescriptionAboutDbChanges(jsonSchema, newSchema, input),
     config
   )
 
   console.log('Generating new sql design')
   const newSqlSchema = await textLLMQuery(
-    Prompts.updateSQLDesignPrompt(jsonSchema, newSchema, sqlSchema, changes, config.database, config.styles),
+    Prompts(config.lang).updateSQLDesignPrompt(jsonSchema, newSchema, sqlSchema, changes, config.database, config.styles),
     config
   )
 
@@ -72,7 +72,7 @@ export async function updateDbDesign(input: string, jsonSchema: DbDesign, sqlSch
 const textLLMQuery = async (prompt: string, config: Config) => {
   const response = await generateText({
     model: getLLMModel(config),
-    system: `Eres un asistente virtual especializado en diseño de software y base de datos ${config.database}.`,
+    system: getSystemPrompt(config),
     prompt
   })
 
@@ -82,7 +82,7 @@ const textLLMQuery = async (prompt: string, config: Config) => {
 const objectLLMQuery = async (prompt: string, schema: ZodSchema, config: Config) => {
   const response = await generateObject({
     model: getLLMModel(config),
-    system: `Eres un asistente virtual especializado en diseño de software y base de datos ${config.database}.`,
+    system: getSystemPrompt(config),
     prompt,
     schema
   })
@@ -108,4 +108,8 @@ function getLLMModel(config: Config) {
     default:
       throw new Error('Invalid model. The flow shouldn\'t arrive here!')
   }
+}
+
+const getSystemPrompt = (config: Config) => {
+  return `Eres un asistente virtual especializado en diseño de software y base de datos ${config.database}.`
 }

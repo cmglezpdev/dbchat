@@ -7,7 +7,7 @@ import { useConfigStore, useDesignStore, useLang } from '@/store'
 import { useToast } from '@/components/ui/use-toast'
 
 export function ChatScreen() {
-  const { data } = useLang(({ data }) => ({ data }))
+  const { data, lang } = useLang(({ data, lang }) => ({ data, lang }))
   const { jsonDesign, setJsonDesign, setSqlDesign, sqlDesign } = useDesignStore()
   const config = useConfigStore((store) => ({
     model: store.model,
@@ -110,7 +110,10 @@ export function ChatScreen() {
           message: userMessage,
           jsonDesign,
           sqlDesign,
-          config
+          config: {
+            ...config,
+            lang
+          }
         })
       })
 
