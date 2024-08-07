@@ -2,7 +2,7 @@ import { ITranduction } from '.'
 
 export const WebContentEN: ITranduction = {
   header: {
-    title: 'Playground',
+    title: 'DB Chat',
     configTitle: 'Configuration',
     configDescription: 'Chat general configuration.',
     continueButton: 'Continue',
